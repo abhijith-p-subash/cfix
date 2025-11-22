@@ -35,6 +35,10 @@ export const generatePDF = (roadmapContent, userInputs) => {
         doc.setFont('helvetica', 'normal');
         doc.text('Your Personalized Career Roadmap', margin, 30);
 
+        // Add Prepared for
+        doc.setFontSize(10);
+        doc.text(`Prepared for: ${userInputs.name || 'Future Professional'}`, margin, 38);
+
         yPosition = 55;
 
         // Add user input summary box

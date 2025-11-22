@@ -12,6 +12,7 @@ import { Sparkles, Loader2 } from 'lucide-react';
 const RoadmapGenerator = ({ onRoadmapGenerated, onFocusChange }) => {
     const { user } = useAuth();
     const [formData, setFormData] = useState({
+        name: '',
         currentRole: '',
         careerGoal: '',
         skills: '',
@@ -84,8 +85,14 @@ const RoadmapGenerator = ({ onRoadmapGenerated, onFocusChange }) => {
                 return;
             }
 
+            // Prepare data with name
+            const submissionData = {
+                ...formData,
+                name: user ? (user.displayName || 'User') : (formData.name || 'Guest')
+            };
+
             // Generate roadmap
-            const roadmap = await generateCareerRoadmap(formData);
+            const roadmap = await generateCareerRoadmap(submissionData);
 
             // Increment usage counter
             if (user) {
@@ -95,13 +102,13 @@ const RoadmapGenerator = ({ onRoadmapGenerated, onFocusChange }) => {
             }
 
             // Save roadmap to Firestore
-            await saveRoadmap(user?.uid, roadmap, formData);
+            await saveRoadmap(user?.uid, roadmap, submissionData);
 
             // Store submitted data to prevent duplicates
             setLastSubmittedData({ ...formData });
 
             // Pass roadmap to parent component
-            onRoadmapGenerated(roadmap, formData);
+            onRoadmapGenerated(roadmap, submissionData);
 
         } catch (err) {
             setError(err.message || 'Failed to generate roadmap. Please try again.');
@@ -111,11 +118,30 @@ const RoadmapGenerator = ({ onRoadmapGenerated, onFocusChange }) => {
     };
 
     const fieldHelp = {
-        currentRole: "Examples: Student, Graduate, Career Changer, Beginner, Junior Developer, etc.",
-        careerGoal: "Popular roles: Software Engineer, Data Scientist, UX Designer, Product Manager, DevOps Engineer",
-        skills: "List any skills (technical or soft skills). If you're just starting, you can write 'Beginner' or leave blank",
-        timeline: "Choose based on how much time you can dedicate to learning",
-        additionalInfo: "Share your interests, constraints, or preferences (e.g., 'Interested in AI', 'Part-time only', 'Remote work preferred')"
+        name: {
+            title: "Your Name",
+            text: "Enter your name so we can personalize your roadmap PDF!"
+        },
+        currentRole: {
+            title: "Current Status",
+            text: "Examples: Student, Graduate, Career Changer, Beginner, Junior Developer, etc."
+        },
+        careerGoal: {
+            title: "Dream Goal",
+            text: "Popular roles: Software Engineer, Data Scientist, UX Designer, Product Manager, DevOps Engineer"
+        },
+        skills: {
+            title: "Your Skills",
+            text: "List any skills (technical or soft skills). If you're just starting, you can write 'Beginner' or leave blank"
+        },
+        timeline: {
+            title: "Timeline",
+            text: "Choose based on how much time you can dedicate to learning"
+        },
+        additionalInfo: {
+            title: "Extra Details",
+            text: "Share your interests, constraints, or preferences (e.g., 'Interested in AI', 'Part-time only', 'Remote work preferred')"
+        }
     };
 
     return (
@@ -130,6 +156,30 @@ const RoadmapGenerator = ({ onRoadmapGenerated, onFocusChange }) => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
+                {!user && (
+                    <div className="space-y-2 relative">
+                        <label htmlFor="name" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                            Your Name
+                        </label>
+                        <input
+                            id="name"
+                            name="name"
+                            type="text"
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            value={formData.name}
+                            onChange={handleChange}
+                            onFocus={() => handleFocus('name')}
+                            onBlur={handleBlur}
+                            placeholder="John Doe"
+                            required
+                        />
+                        {focusedField === 'name' && (
+                            <div className="absolute left-0 top-full z-10 mt-1 w-full rounded-md border bg-popover p-2 text-xs text-popover-foreground shadow-md md:hidden animate-in fade-in zoom-in-95 duration-200">
+                                {fieldHelp.name.text}
+                            </div>
+                        )}
+                    </div>
+                )}
                 <div className="grid gap-6 md:grid-cols-2">
                     <div className="space-y-2 relative">
                         <label htmlFor="currentRole" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -150,7 +200,7 @@ const RoadmapGenerator = ({ onRoadmapGenerated, onFocusChange }) => {
                         {/* Mobile Hint (Absolute) */}
                         {focusedField === 'currentRole' && (
                             <div className="absolute left-0 top-full z-10 mt-1 w-full rounded-md border bg-popover p-2 text-xs text-popover-foreground shadow-md md:hidden animate-in fade-in zoom-in-95 duration-200">
-                                {fieldHelp.currentRole}
+                                {fieldHelp.currentRole.text}
                             </div>
                         )}
                     </div>
@@ -173,7 +223,7 @@ const RoadmapGenerator = ({ onRoadmapGenerated, onFocusChange }) => {
                         />
                         {focusedField === 'careerGoal' && (
                             <div className="absolute left-0 top-full z-10 mt-1 w-full rounded-md border bg-popover p-2 text-xs text-popover-foreground shadow-md md:hidden animate-in fade-in zoom-in-95 duration-200">
-                                {fieldHelp.careerGoal}
+                                {fieldHelp.careerGoal.text}
                             </div>
                         )}
                     </div>
@@ -196,7 +246,7 @@ const RoadmapGenerator = ({ onRoadmapGenerated, onFocusChange }) => {
                     />
                     {focusedField === 'skills' && (
                         <div className="absolute left-0 top-full z-10 mt-1 w-full rounded-md border bg-popover p-2 text-xs text-popover-foreground shadow-md md:hidden animate-in fade-in zoom-in-95 duration-200">
-                            {fieldHelp.skills}
+                            {fieldHelp.skills.text}
                         </div>
                     )}
                 </div>
@@ -223,7 +273,7 @@ const RoadmapGenerator = ({ onRoadmapGenerated, onFocusChange }) => {
                     </select>
                     {focusedField === 'timeline' && (
                         <div className="absolute left-0 top-full z-10 mt-1 w-full rounded-md border bg-popover p-2 text-xs text-popover-foreground shadow-md md:hidden animate-in fade-in zoom-in-95 duration-200">
-                            {fieldHelp.timeline}
+                            {fieldHelp.timeline.text}
                         </div>
                     )}
                 </div>
@@ -245,7 +295,7 @@ const RoadmapGenerator = ({ onRoadmapGenerated, onFocusChange }) => {
                     />
                     {focusedField === 'additionalInfo' && (
                         <div className="absolute left-0 top-full z-10 mt-1 w-full rounded-md border bg-popover p-2 text-xs text-popover-foreground shadow-md md:hidden animate-in fade-in zoom-in-95 duration-200">
-                            {fieldHelp.additionalInfo}
+                            {fieldHelp.additionalInfo.text}
                         </div>
                     )}
                 </div>
@@ -258,7 +308,7 @@ const RoadmapGenerator = ({ onRoadmapGenerated, onFocusChange }) => {
 
                 <button
                     type="submit"
-                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 w-full text-lg shadow-md hover:shadow-lg transition-all"
+                    className="inline-flex items-center justify-center rounded-md font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 w-full text-lg shadow-md hover:shadow-lg transition-all"
                     disabled={loading}
                 >
                     {loading ? (
