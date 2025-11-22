@@ -6,6 +6,7 @@ import './RoadmapDisplay.css';
 const RoadmapDisplay = ({ roadmap, userInputs }) => {
     const { user } = useAuth();
     const [downloading, setDownloading] = useState(false);
+    const [lastDownloadTime, setLastDownloadTime] = useState(0);
 
     const handleDownloadPDF = async () => {
         if (!user) {
@@ -13,13 +14,31 @@ const RoadmapDisplay = ({ roadmap, userInputs }) => {
             return;
         }
 
+        // Debounce: prevent multiple clicks within 2 seconds
+        const now = Date.now();
+        const timeSinceLastDownload = now - lastDownloadTime;
+
+        if (downloading) {
+            return; // Already downloading
+        }
+
+        if (timeSinceLastDownload < 2000) {
+            alert('⏳ Please wait a moment before downloading again.');
+            return;
+        }
+
         setDownloading(true);
+        setLastDownloadTime(now);
+
         try {
             await generatePDF(roadmap, userInputs);
         } catch (error) {
             alert('Failed to generate PDF. Please try again.');
         } finally {
-            setDownloading(false);
+            // Keep downloading state for at least 1 second to prevent rapid re-clicks
+            setTimeout(() => {
+                setDownloading(false);
+            }, 1000);
         }
     };
 

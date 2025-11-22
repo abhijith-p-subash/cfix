@@ -18,6 +18,7 @@ const RoadmapGenerator = ({ onRoadmapGenerated }) => {
         timeline: '',
         additionalInfo: ''
     });
+    const [lastSubmittedData, setLastSubmittedData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -27,11 +28,33 @@ const RoadmapGenerator = ({ onRoadmapGenerated }) => {
             ...prev,
             [name]: value
         }));
+        // Clear error when user changes form
+        if (error) setError('');
+    };
+
+    // Check if current form data is identical to last submission
+    const isDuplicate = () => {
+        if (!lastSubmittedData) return false;
+
+        return (
+            lastSubmittedData.currentRole === formData.currentRole &&
+            lastSubmittedData.careerGoal === formData.careerGoal &&
+            lastSubmittedData.skills === formData.skills &&
+            lastSubmittedData.timeline === formData.timeline &&
+            lastSubmittedData.additionalInfo === formData.additionalInfo
+        );
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+
+        // Check for duplicate submission
+        if (isDuplicate()) {
+            setError('⚠️ You already generated a roadmap with this exact data. Try modifying your inputs to create a new roadmap!');
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -62,6 +85,9 @@ const RoadmapGenerator = ({ onRoadmapGenerated }) => {
 
             // Save roadmap to Firestore
             await saveRoadmap(user?.uid, roadmap, formData);
+
+            // Store submitted data to prevent duplicates
+            setLastSubmittedData({ ...formData });
 
             // Pass roadmap to parent component
             onRoadmapGenerated(roadmap, formData);
