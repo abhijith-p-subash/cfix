@@ -58,6 +58,27 @@ export const getUserUsage = async (userId) => {
 export const incrementUserUsage = async (userId) => {
     try {
         const userRef = doc(db, 'users', userId);
+        const userDoc = await getDoc(userRef);
+
+        // If user document doesn't exist, create it first
+        if (!userDoc.exists()) {
+            const { setDoc, serverTimestamp } = await import('firebase/firestore');
+            const { auth } = await import('../config/firebase');
+            const user = auth.currentUser;
+
+            await setDoc(userRef, {
+                uid: userId,
+                email: user?.email || '',
+                displayName: user?.displayName || user?.email?.split('@')[0] || 'User',
+                createdAt: serverTimestamp(),
+                roadmapCount: 1,
+                maxFreeRoadmaps: 2
+            });
+
+            return { count: 1, maxFree: 2 };
+        }
+
+        // Document exists, increment the count
         await updateDoc(userRef, {
             roadmapCount: increment(1)
         });

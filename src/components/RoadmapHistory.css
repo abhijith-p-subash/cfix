@@ -1,0 +1,108 @@
+.roadmap-history {
+    background: var(--color-surface);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-md);
+    margin-top: var(--spacing-2xl);
+}
+
+.history-title {
+    margin-bottom: var(--spacing-lg);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-xl);
+}
+
+.history-loading,
+.history-empty,
+.history-error {
+    text-align: center;
+    padding: var(--spacing-3xl) var(--spacing-xl);
+}
+
+.history-loading p,
+.history-empty p,
+.history-error p {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-base);
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.history-item {
+    background: var(--color-surface-alt);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.history-item:hover {
+    border-color: var(--color-primary-light);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.history-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+}
+
+.history-item-number {
+    font-weight: 700;
+    color: var(--color-primary);
+    font-size: var(--font-size-sm);
+}
+
+.history-item-date {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-light);
+}
+
+.history-item-content {
+    margin-bottom: var(--spacing-sm);
+}
+
+.history-item-goal {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.history-item-timeline {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+.history-item-action {
+    text-align: right;
+}
+
+.view-link {
+    color: var(--color-primary-light);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    transition: color var(--transition-fast);
+}
+
+.history-item:hover .view-link {
+    color: var(--color-primary);
+}
+
+@media (max-width: 768px) {
+    .roadmap-history {
+        padding: var(--spacing-md);
+    }
+
+    .history-item {
+        padding: var(--spacing-md);
+    }
+}

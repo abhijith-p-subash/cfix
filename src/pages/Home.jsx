@@ -3,15 +3,33 @@ import Header from '../components/Header';
 import UsageIndicator from '../components/UsageIndicator';
 import RoadmapGenerator from '../components/RoadmapGenerator';
 import RoadmapDisplay from '../components/RoadmapDisplay';
+import RoadmapHistory from '../components/RoadmapHistory';
 import './Home.css';
 
 const Home = () => {
     const [generatedRoadmap, setGeneratedRoadmap] = useState(null);
     const [userInputs, setUserInputs] = useState(null);
+    const [refreshKey, setRefreshKey] = useState(0);
 
     const handleRoadmapGenerated = (roadmap, inputs) => {
         setGeneratedRoadmap(roadmap);
         setUserInputs(inputs);
+
+        // Trigger usage indicator refresh
+        setRefreshKey(prev => prev + 1);
+
+        // Scroll to roadmap display
+        setTimeout(() => {
+            document.getElementById('roadmap-result')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }, 100);
+    };
+
+    const handleSelectHistoryRoadmap = (roadmap) => {
+        setGeneratedRoadmap(roadmap.content);
+        setUserInputs(roadmap.userInputs);
 
         // Scroll to roadmap display
         setTimeout(() => {
@@ -55,8 +73,12 @@ const Home = () => {
 
             <section className="generator-section section">
                 <div className="container container-narrow">
-                    <UsageIndicator />
+                    <UsageIndicator refreshTrigger={refreshKey} />
                     <RoadmapGenerator onRoadmapGenerated={handleRoadmapGenerated} />
+                    <RoadmapHistory
+                        onSelectRoadmap={handleSelectHistoryRoadmap}
+                        refreshTrigger={refreshKey}
+                    />
                 </div>
             </section>
 

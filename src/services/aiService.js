@@ -52,8 +52,9 @@ Format the response in clear, well-structured markdown with headers, bullet poin
             model: 'gemini-2.0-flash',
             contents: prompt
         });
-
-        const roadmap = response.text;
+        console.log("GEMINI RESPONSE", response);
+        // Extract text from the response structure
+        const roadmap = response.candidates[0].content.parts[0].text;
         return roadmap;
     } catch (error) {
         console.error('Error generating roadmap:', error);
@@ -66,11 +67,16 @@ Format the response in clear, well-structured markdown with headers, bullet poin
  */
 export const saveRoadmap = async (userId, roadmapContent, userInputs) => {
     try {
+        console.log("SAVING ROADMAP", userId, roadmapContent, userInputs);
         const { db } = await import('../config/firebase');
         const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
+        const { getGuestId } = await import('./migrationService');
+
+        // Use unique guest ID if no user ID provided
+        const effectiveUserId = userId || getGuestId();
 
         await addDoc(collection(db, 'roadmaps'), {
-            userId: userId || 'guest',
+            userId: effectiveUserId,
             content: roadmapContent,
             userInputs,
             createdAt: serverTimestamp()

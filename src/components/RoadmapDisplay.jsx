@@ -23,10 +23,39 @@ const RoadmapDisplay = ({ roadmap, userInputs }) => {
         }
     };
 
-    // Convert markdown-style formatting to HTML
+    // Convert markdown-style formatting to HTML with proper bold/italic handling
     const formatRoadmap = (text) => {
         const lines = text.split('\n');
         let formatted = [];
+
+        // Helper function to convert inline markdown to JSX
+        const parseInlineMarkdown = (text) => {
+            const parts = [];
+            let currentText = text;
+            let key = 0;
+
+            // Parse bold (**text**)
+            const boldRegex = /\*\*(.+?)\*\*/g;
+            let lastIndex = 0;
+            let match;
+
+            while ((match = boldRegex.exec(currentText)) !== null) {
+                // Add text before the match
+                if (match.index > lastIndex) {
+                    parts.push(currentText.substring(lastIndex, match.index));
+                }
+                // Add bold text
+                parts.push(<strong key={`bold-${key++}`}>{match[1]}</strong>);
+                lastIndex = match.index + match[0].length;
+            }
+
+            // Add remaining text
+            if (lastIndex < currentText.length) {
+                parts.push(currentText.substring(lastIndex));
+            }
+
+            return parts.length > 0 ? parts : currentText;
+        };
 
         lines.forEach((line, index) => {
             const trimmed = line.trim();
@@ -36,31 +65,31 @@ const RoadmapDisplay = ({ roadmap, userInputs }) => {
             } else if (trimmed.startsWith('###')) {
                 formatted.push(
                     <h4 key={index} className="roadmap-h4">
-                        {trimmed.replace(/^###\s*/, '')}
+                        {parseInlineMarkdown(trimmed.replace(/^###\s*/, ''))}
                     </h4>
                 );
             } else if (trimmed.startsWith('##')) {
                 formatted.push(
                     <h3 key={index} className="roadmap-h3">
-                        {trimmed.replace(/^##\s*/, '')}
+                        {parseInlineMarkdown(trimmed.replace(/^##\s*/, ''))}
                     </h3>
                 );
             } else if (trimmed.startsWith('#')) {
                 formatted.push(
                     <h2 key={index} className="roadmap-h2">
-                        {trimmed.replace(/^#\s*/, '')}
+                        {parseInlineMarkdown(trimmed.replace(/^#\s*/, ''))}
                     </h2>
                 );
             } else if (trimmed.startsWith('-') || trimmed.startsWith('•') || trimmed.startsWith('*')) {
                 formatted.push(
                     <li key={index} className="roadmap-li">
-                        {trimmed.replace(/^[-•*]\s*/, '').replace(/\*\*/g, '')}
+                        {parseInlineMarkdown(trimmed.replace(/^[-•*]\s*/, ''))}
                     </li>
                 );
             } else {
                 formatted.push(
                     <p key={index} className="roadmap-p">
-                        {trimmed.replace(/\*\*/g, '')}
+                        {parseInlineMarkdown(trimmed)}
                     </p>
                 );
             }

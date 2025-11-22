@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { getRemainingGenerations } from '../services/usageService';
 import './UsageIndicator.css';
 
-const UsageIndicator = () => {
+const UsageIndicator = ({ refreshTrigger }) => {
     const { user } = useAuth();
     const [remaining, setRemaining] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -21,7 +21,7 @@ const UsageIndicator = () => {
         };
 
         fetchRemaining();
-    }, [user]);
+    }, [user, refreshTrigger]); // Re-fetch when refreshTrigger changes
 
     if (loading) return null;
 
@@ -32,10 +32,10 @@ const UsageIndicator = () => {
         <div className="usage-indicator">
             <div className="usage-header">
                 <span className="usage-label">
-                    {user ? 'Free Roadmaps' : 'Trial Roadmap'}
+                    {user ? '🎯 Free Roadmaps' : '🎁 Trial Roadmap'}
                 </span>
                 <span className="usage-count">
-                    {remaining} / {maxGenerations} remaining
+                    {remaining} of {maxGenerations} remaining
                 </span>
             </div>
 
@@ -56,8 +56,8 @@ const UsageIndicator = () => {
                 <div className="usage-limit-message">
                     <p>
                         {user
-                            ? "You've used your free roadmap generations. Upgrade to continue!"
-                            : "Sign up to get 2 more free roadmaps!"}
+                            ? "🎉 You've used your free roadmap generations. Loving it? Upgrade for unlimited access!"
+                            : "🚀 Sign up to get 2 more free roadmaps with PDF downloads!"}
                     </p>
                 </div>
             )}

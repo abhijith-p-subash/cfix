@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { onAuthChange } from '../services/authService';
+import { migrateGuestRoadmaps } from '../services/migrationService';
 
 const AuthContext = createContext({});
 
@@ -16,7 +17,15 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const unsubscribe = onAuthChange((user) => {
+        const unsubscribe = onAuthChange(async (user) => {
+            if (user) {
+                // User just logged in - migrate any guest roadmaps
+                try {
+                    await migrateGuestRoadmaps(user.uid);
+                } catch (error) {
+                    console.error('Error during roadmap migration:', error);
+                }
+            }
             setUser(user);
             setLoading(false);
         });
