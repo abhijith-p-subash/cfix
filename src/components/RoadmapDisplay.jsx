@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { useAuth } from '../context/AuthContext';
 import { generatePDF } from '../services/pdfService';
 import { Download, Lock, FileText, Loader2 } from 'lucide-react';
@@ -42,79 +43,19 @@ const RoadmapDisplay = ({ roadmap, userInputs }) => {
         }
     };
 
-    // Convert markdown-style formatting to HTML with proper bold/italic handling
-    const formatRoadmap = (text) => {
-        const lines = text.split('\n');
-        let formatted = [];
-
-        // Helper function to convert inline markdown to JSX
-        const parseInlineMarkdown = (text) => {
-            const parts = [];
-            let currentText = text;
-            let key = 0;
-
-            // Parse bold (**text**)
-            const boldRegex = /\*\*(.+?)\*\*/g;
-            let lastIndex = 0;
-            let match;
-
-            while ((match = boldRegex.exec(currentText)) !== null) {
-                // Add text before the match
-                if (match.index > lastIndex) {
-                    parts.push(currentText.substring(lastIndex, match.index));
-                }
-                // Add bold text
-                parts.push(<strong key={`bold-${key++}`} className="font-semibold text-foreground">{match[1]}</strong>);
-                lastIndex = match.index + match[0].length;
-            }
-
-            // Add remaining text
-            if (lastIndex < currentText.length) {
-                parts.push(currentText.substring(lastIndex));
-            }
-
-            return parts.length > 0 ? parts : currentText;
-        };
-
-        lines.forEach((line, index) => {
-            const trimmed = line.trim();
-
-            if (!trimmed) {
-                formatted.push(<div key={`br-${index}`} className="h-4" />);
-            } else if (trimmed.startsWith('###')) {
-                formatted.push(
-                    <h4 key={index} className="mt-6 mb-2 text-lg font-semibold text-primary">
-                        {parseInlineMarkdown(trimmed.replace(/^###\s*/, ''))}
-                    </h4>
-                );
-            } else if (trimmed.startsWith('##')) {
-                formatted.push(
-                    <h3 key={index} className="mt-8 mb-4 text-xl font-bold text-foreground border-b pb-2">
-                        {parseInlineMarkdown(trimmed.replace(/^##\s*/, ''))}
-                    </h3>
-                );
-            } else if (trimmed.startsWith('#')) {
-                formatted.push(
-                    <h2 key={index} className="mt-10 mb-6 text-2xl font-bold text-primary">
-                        {parseInlineMarkdown(trimmed.replace(/^#\s*/, ''))}
-                    </h2>
-                );
-            } else if (trimmed.startsWith('-') || trimmed.startsWith('•') || trimmed.startsWith('*')) {
-                formatted.push(
-                    <li key={index} className="ml-4 list-disc marker:text-primary mb-2 pl-1 text-muted-foreground">
-                        {parseInlineMarkdown(trimmed.replace(/^[-•*]\s*/, ''))}
-                    </li>
-                );
-            } else {
-                formatted.push(
-                    <p key={index} className="mb-4 leading-relaxed text-muted-foreground">
-                        {parseInlineMarkdown(trimmed)}
-                    </p>
-                );
-            }
-        });
-
-        return formatted;
+    // ReactMarkdown handles the rendering now, so we don't need manual formatting
+    // But we can keep a wrapper or custom components if needed
+    const MarkdownComponents = {
+        h1: ({ node, ...props }) => <h1 className="mt-10 mb-6 text-3xl font-bold text-primary" {...props} />,
+        h2: ({ node, ...props }) => <h2 className="mt-8 mb-4 text-2xl font-bold text-primary" {...props} />,
+        h3: ({ node, ...props }) => <h3 className="mt-6 mb-3 text-xl font-semibold text-foreground border-b pb-2" {...props} />,
+        h4: ({ node, ...props }) => <h4 className="mt-4 mb-2 text-lg font-semibold text-foreground" {...props} />,
+        p: ({ node, ...props }) => <p className="mb-4 leading-relaxed text-muted-foreground" {...props} />,
+        ul: ({ node, ...props }) => <ul className="mb-4 ml-6 list-disc marker:text-primary" {...props} />,
+        ol: ({ node, ...props }) => <ol className="mb-4 ml-6 list-decimal marker:text-primary" {...props} />,
+        li: ({ node, ...props }) => <li className="mb-2 pl-1 text-muted-foreground" {...props} />,
+        strong: ({ node, ...props }) => <strong className="font-semibold text-foreground" {...props} />,
+        blockquote: ({ node, ...props }) => <blockquote className="border-l-4 border-primary/30 pl-4 italic text-muted-foreground my-4" {...props} />,
     };
 
     return (
@@ -169,7 +110,9 @@ const RoadmapDisplay = ({ roadmap, userInputs }) => {
 
 
                 <div className="space-y-1">
-                    {formatRoadmap(roadmap)}
+                    <ReactMarkdown components={MarkdownComponents}>
+                        {roadmap}
+                    </ReactMarkdown>
                 </div>
 
                 <div className="mt-8 rounded-lg bg-primary/5 p-4 text-sm text-primary border border-primary/10">

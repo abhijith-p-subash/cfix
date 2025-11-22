@@ -46,7 +46,13 @@ Please provide a comprehensive career roadmap that includes:
 
 7. **Job Search Strategy**: How to position yourself when the time comes to make the transition
 
-Format the response in clear, well-structured markdown with headers, bullet points, and emphasis where appropriate. Be specific, actionable, and encouraging. Focus on practical steps the person can take.`;
+Format the response in standard, clean markdown.
+- Use **bold** for emphasis.
+- Use headers (#, ##, ###) for sections.
+- Use bullet points (-) for lists.
+- Do NOT use code blocks, tables, or complex nesting.
+- Keep the structure simple and easy to parse.
+- Be specific, actionable, and encouraging.`;
 
         const response = await ai.models.generateContent({
             model: 'gemini-2.0-flash',
