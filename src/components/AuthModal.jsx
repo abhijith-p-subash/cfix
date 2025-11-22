@@ -37,7 +37,14 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
             await signInWithGoogle();
             onClose();
         } catch (err) {
-            setError(err.message || 'An error occurred. Please try again.');
+            console.error("Google Sign In Error:", err);
+            if (err.message && (err.message.includes('network') || err.message.includes('protocol') || err.message.includes('QUIC'))) {
+                setError('Network error detected. Please check your connection, disable VPN, or try a different browser.');
+            } else if (err.message.includes('auth/operation-not-allowed')) {
+                setError('Google Sign-In is not enabled in the Firebase Console. Please enable it in Authentication > Sign-in method.');
+            } else {
+                setError(err.message || 'An error occurred. Please try again.');
+            }
         } finally {
             setLoading(false);
         }
