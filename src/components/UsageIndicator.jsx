@@ -25,7 +25,7 @@ const UsageIndicator = ({ refreshTrigger }) => {
 
     if (loading) return null;
 
-    const maxGenerations = user ? 2 : 1;
+    const maxGenerations = user ? 3 : 1;
     const usedGenerations = maxGenerations - remaining;
     const percentage = (usedGenerations / maxGenerations) * 100;
 
@@ -52,7 +52,7 @@ const UsageIndicator = ({ refreshTrigger }) => {
 
             {!user && remaining > 0 && (
                 <p className="mt-2 text-xs text-muted-foreground">
-                    💡 Sign up to get 2 free roadmaps with PDF downloads!
+                    💡 Sign up to get 3 free roadmaps with PDF downloads!
                 </p>
             )}
 
@@ -60,8 +60,8 @@ const UsageIndicator = ({ refreshTrigger }) => {
                 <div className="mt-4 rounded-md bg-muted p-3 text-sm">
                     <p className="text-center font-medium text-foreground">
                         {user
-                            ? "🎉 You've used your free roadmap generations. Loving it? Upgrade for unlimited access!"
-                            : "🚀 Sign up to get 2 more free roadmaps with PDF downloads!"}
+                            ? "You've used your free roadmap generations. Loving it? Upgrade for unlimited access!"
+                            : "Sign up to get 3 more free roadmaps with PDF downloads!"}
                     </p>
                 </div>
             )}

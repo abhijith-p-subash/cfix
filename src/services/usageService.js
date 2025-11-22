@@ -42,13 +42,13 @@ export const getUserUsage = async (userId) => {
             const data = userDoc.data();
             return {
                 count: data.roadmapCount || 0,
-                maxFree: data.maxFreeRoadmaps || 2
+                maxFree: data.maxFreeRoadmaps || 3
             };
         }
-        return { count: 0, maxFree: 2 };
+        return { count: 0, maxFree: 3 };
     } catch (error) {
         console.error('Error getting user usage:', error);
-        return { count: 0, maxFree: 2 };
+        return { count: 0, maxFree: 3 };
     }
 };
 
@@ -72,10 +72,10 @@ export const incrementUserUsage = async (userId) => {
                 displayName: user?.displayName || user?.email?.split('@')[0] || 'User',
                 createdAt: serverTimestamp(),
                 roadmapCount: 1,
-                maxFreeRoadmaps: 2
+                maxFreeRoadmaps: 3
             });
 
-            return { count: 1, maxFree: 2 };
+            return { count: 1, maxFree: 3 };
         }
 
         // Document exists, increment the count

@@ -29,7 +29,7 @@ export const signUpWithEmail = async (email, password, displayName) => {
             displayName: displayName || email.split('@')[0],
             createdAt: serverTimestamp(),
             roadmapCount: 0,
-            maxFreeRoadmaps: 2
+            maxFreeRoadmaps: 3
         });
 
         return user;
@@ -69,7 +69,7 @@ export const signInWithGoogle = async () => {
                 displayName: user.displayName || user.email.split('@')[0],
                 createdAt: serverTimestamp(),
                 roadmapCount: 0,
-                maxFreeRoadmaps: 2
+                maxFreeRoadmaps: 3
             });
         }
 
