@@ -7,7 +7,7 @@ import {
     incrementUserUsage
 } from '../services/usageService';
 import { generateCareerRoadmap, saveRoadmap } from '../services/aiService';
-import './RoadmapGenerator.css';
+import { Sparkles, Loader2 } from 'lucide-react';
 
 const RoadmapGenerator = ({ onRoadmapGenerated }) => {
     const { user } = useAuth();
@@ -117,25 +117,27 @@ const RoadmapGenerator = ({ onRoadmapGenerated }) => {
     };
 
     return (
-        <div className="roadmap-generator">
-            <div className="generator-header">
-                <h2>Build Your Career Roadmap</h2>
-                <p className="text-muted">
+        <div className="w-full max-w-3xl mx-auto rounded-xl border bg-card p-8 shadow-sm">
+            <div className="mb-8 text-center">
+                <h2 className="mb-2 text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                    Build Your Career Roadmap
+                </h2>
+                <p className="text-muted-foreground">
                     Tell us about yourself and your goals - we'll create a personalized roadmap just for you! 🎯
                 </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="generator-form">
-                <div className="form-row">
-                    <div className="form-group">
-                        <label htmlFor="currentRole" className="form-label">
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid gap-6 md:grid-cols-2">
+                    <div className="space-y-2">
+                        <label htmlFor="currentRole" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                             Where are you now?
                         </label>
                         <input
                             id="currentRole"
                             name="currentRole"
                             type="text"
-                            className="form-input"
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                             value={formData.currentRole}
                             onChange={handleChange}
                             onFocus={() => handleFocus('currentRole')}
@@ -144,19 +146,21 @@ const RoadmapGenerator = ({ onRoadmapGenerated }) => {
                             required
                         />
                         {focusedField === 'currentRole' && (
-                            <p className="field-hint active">{fieldHelp.currentRole}</p>
+                            <div className="mt-2 rounded-md border-l-4 border-primary bg-secondary/50 p-3 text-sm text-primary animate-in slide-in-from-top-2 fade-in duration-200">
+                                {fieldHelp.currentRole}
+                            </div>
                         )}
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="careerGoal" className="form-label">
+                    <div className="space-y-2">
+                        <label htmlFor="careerGoal" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                             Dream Career Goal?
                         </label>
                         <input
                             id="careerGoal"
                             name="careerGoal"
                             type="text"
-                            className="form-input"
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                             value={formData.careerGoal}
                             onChange={handleChange}
                             onFocus={() => handleFocus('careerGoal')}
@@ -165,20 +169,22 @@ const RoadmapGenerator = ({ onRoadmapGenerated }) => {
                             required
                         />
                         {focusedField === 'careerGoal' && (
-                            <p className="field-hint active">{fieldHelp.careerGoal}</p>
+                            <div className="mt-2 rounded-md border-l-4 border-primary bg-secondary/50 p-3 text-sm text-primary animate-in slide-in-from-top-2 fade-in duration-200">
+                                {fieldHelp.careerGoal}
+                            </div>
                         )}
                     </div>
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="skills" className="form-label">
-                        Skills You Have <span className="optional-tag">(optional)</span>
+                <div className="space-y-2">
+                    <label htmlFor="skills" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        Skills You Have <span className="text-xs font-normal italic text-muted-foreground">(optional)</span>
                     </label>
                     <input
                         id="skills"
                         name="skills"
                         type="text"
-                        className="form-input"
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         value={formData.skills}
                         onChange={handleChange}
                         onFocus={() => handleFocus('skills')}
@@ -186,18 +192,20 @@ const RoadmapGenerator = ({ onRoadmapGenerated }) => {
                         placeholder="e.g., Python, Communication, or 'Beginner'"
                     />
                     {focusedField === 'skills' && (
-                        <p className="field-hint active">{fieldHelp.skills}</p>
+                        <div className="mt-2 rounded-md border-l-4 border-primary bg-secondary/50 p-3 text-sm text-primary animate-in slide-in-from-top-2 fade-in duration-200">
+                            {fieldHelp.skills}
+                        </div>
                     )}
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="timeline" className="form-label">
+                <div className="space-y-2">
+                    <label htmlFor="timeline" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                         Timeline to Achieve Goal
                     </label>
                     <select
                         id="timeline"
                         name="timeline"
-                        className="form-select"
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         value={formData.timeline}
                         onChange={handleChange}
                         onFocus={() => handleFocus('timeline')}
@@ -211,18 +219,20 @@ const RoadmapGenerator = ({ onRoadmapGenerated }) => {
                         <option value="3+ years">3+ years</option>
                     </select>
                     {focusedField === 'timeline' && (
-                        <p className="field-hint active">{fieldHelp.timeline}</p>
+                        <div className="mt-2 rounded-md border-l-4 border-primary bg-secondary/50 p-3 text-sm text-primary animate-in slide-in-from-top-2 fade-in duration-200">
+                            {fieldHelp.timeline}
+                        </div>
                     )}
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="additionalInfo" className="form-label">
-                        Additional Details <span className="optional-tag">(optional)</span>
+                <div className="space-y-2">
+                    <label htmlFor="additionalInfo" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        Additional Details <span className="text-xs font-normal italic text-muted-foreground">(optional)</span>
                     </label>
                     <textarea
                         id="additionalInfo"
                         name="additionalInfo"
-                        className="form-textarea"
+                        className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         value={formData.additionalInfo}
                         onChange={handleChange}
                         onFocus={() => handleFocus('additionalInfo')}
@@ -231,29 +241,31 @@ const RoadmapGenerator = ({ onRoadmapGenerated }) => {
                         rows={3}
                     />
                     {focusedField === 'additionalInfo' && (
-                        <p className="field-hint active">{fieldHelp.additionalInfo}</p>
+                        <div className="mt-2 rounded-md border-l-4 border-primary bg-secondary/50 p-3 text-sm text-primary animate-in slide-in-from-top-2 fade-in duration-200">
+                            {fieldHelp.additionalInfo}
+                        </div>
                     )}
                 </div>
 
                 {error && (
-                    <div className="error-message">
+                    <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
                         {error}
                     </div>
                 )}
 
                 <button
                     type="submit"
-                    className="btn btn-primary btn-lg generate-btn"
+                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 w-full text-lg shadow-md hover:shadow-lg transition-all"
                     disabled={loading}
                 >
                     {loading ? (
                         <>
-                            <div className="loading-spinner" style={{ width: '20px', height: '20px' }}></div>
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                             Generating Your Roadmap...
                         </>
                     ) : (
                         <>
-                            <span>✨</span>
+                            <Sparkles className="mr-2 h-5 w-5" />
                             Generate My Roadmap
                         </>
                     )}

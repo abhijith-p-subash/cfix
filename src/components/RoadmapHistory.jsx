@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { collection, query, where, orderBy, getDocs, limit } from 'firebase/firestore';
+import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import './RoadmapHistory.css';
+import { History, Calendar, Clock, ArrowRight, Loader2 } from 'lucide-react';
 
 const RoadmapHistory = ({ onSelectRoadmap, refreshTrigger }) => {
     const { user } = useAuth();
@@ -57,41 +57,40 @@ const RoadmapHistory = ({ onSelectRoadmap, refreshTrigger }) => {
 
     if (!user) {
         return (
-            <div className="roadmap-history">
-                <div className="history-empty">
-                    <p>📝 Sign in to view your roadmap history</p>
+            <div className="mt-12 text-center">
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                    <History className="h-6 w-6 text-muted-foreground" />
                 </div>
+                <h3 className="mt-4 text-lg font-semibold">No History Yet</h3>
+                <p className="mt-2 text-muted-foreground">Sign in to view your roadmap history</p>
             </div>
         );
     }
 
     if (loading) {
         return (
-            <div className="roadmap-history">
-                <div className="history-loading">
-                    <div className="loading-spinner"></div>
-                    <p>Loading your roadmaps...</p>
-                </div>
+            <div className="mt-12 flex justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="roadmap-history">
-                <div className="history-error">
-                    <p>❌ {error}</p>
-                </div>
+            <div className="mt-12 rounded-md bg-destructive/15 p-4 text-center text-destructive">
+                <p>❌ {error}</p>
             </div>
         );
     }
 
     if (roadmaps.length === 0) {
         return (
-            <div className="roadmap-history">
-                <div className="history-empty">
-                    <p>📝 No roadmaps yet. Generate your first one above!</p>
+            <div className="mt-12 text-center">
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                    <History className="h-6 w-6 text-muted-foreground" />
                 </div>
+                <h3 className="mt-4 text-lg font-semibold">No Roadmaps Yet</h3>
+                <p className="mt-2 text-muted-foreground">Generate your first roadmap above!</p>
             </div>
         );
     }
@@ -109,32 +108,37 @@ const RoadmapHistory = ({ onSelectRoadmap, refreshTrigger }) => {
     };
 
     return (
-        <div className="roadmap-history">
-            <h3 className="history-title">📚 Your Roadmap History</h3>
+        <div className="mt-16 w-full max-w-4xl mx-auto">
+            <h3 className="mb-6 flex items-center gap-2 text-xl font-bold">
+                <History className="h-5 w-5" />
+                Your Roadmap History
+            </h3>
 
-            <div className="history-list">
+            <div className="grid gap-4 sm:grid-cols-2">
                 {roadmaps.map((roadmap, index) => (
                     <div
                         key={roadmap.id}
-                        className="history-item"
+                        className="group relative cursor-pointer rounded-lg border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:border-primary/50"
                         onClick={() => onSelectRoadmap(roadmap)}
                     >
-                        <div className="history-item-header">
-                            <span className="history-item-number">#{roadmaps.length - index}</span>
-                            <span className="history-item-date">
+                        <div className="mb-4 flex items-center justify-between text-xs text-muted-foreground">
+                            <span className="font-medium text-primary">#{roadmaps.length - index}</span>
+                            <span className="flex items-center gap-1">
+                                <Calendar className="h-3 w-3" />
                                 {formatDate(roadmap.createdAt)}
                             </span>
                         </div>
-                        <div className="history-item-content">
-                            <h4 className="history-item-goal">
-                                {roadmap.userInputs?.currentRole} → {roadmap.userInputs?.careerGoal}
-                            </h4>
-                            <p className="history-item-timeline">
-                                ⏱️ {roadmap.userInputs?.timeline}
+
+                        <h4 className="mb-2 font-semibold leading-tight group-hover:text-primary">
+                            {roadmap.userInputs?.currentRole} → {roadmap.userInputs?.careerGoal}
+                        </h4>
+
+                        <div className="flex items-center justify-between">
+                            <p className="flex items-center gap-1 text-sm text-muted-foreground">
+                                <Clock className="h-3 w-3" />
+                                {roadmap.userInputs?.timeline}
                             </p>
-                        </div>
-                        <div className="history-item-action">
-                            <span className="view-link">View →</span>
+                            <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary" />
                         </div>
                     </div>
                 ))}

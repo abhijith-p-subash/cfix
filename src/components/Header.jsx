@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { logOut } from '../services/authService';
 import AuthModal from './AuthModal';
-import './Header.css';
+import { User, LogOut } from 'lucide-react';
 
 const Header = () => {
     const { user } = useAuth();
@@ -24,40 +24,49 @@ const Header = () => {
 
     return (
         <>
-            <header className="header">
-                <div className="container">
-                    <div className="header-content">
-                        <div className="logo">
-                            <h1 className="logo-text">
-                                <span className="logo-primary">Career</span>
-                                <span className="logo-secondary">Fix</span>
-                                <span className="logo-ai">.AI</span>
-                            </h1>
-                        </div>
-
-                        <nav className="nav">
-                            {user ? (
-                                <div className="user-section">
-                                    <div className="user-info">
-                                        <span className="user-icon">👤</span>
-                                        <span className="user-name">{user.displayName || user.email}</span>
-                                    </div>
-                                    <button onClick={handleSignOut} className="btn btn-outline btn-sm">
-                                        Sign Out
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="auth-buttons">
-                                    <button onClick={() => openAuthModal('signin')} className="btn btn-ghost btn-sm">
-                                        Sign In
-                                    </button>
-                                    <button onClick={() => openAuthModal('signup')} className="btn btn-primary btn-sm">
-                                        Sign Up
-                                    </button>
-                                </div>
-                            )}
-                        </nav>
+            <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                <div className="container mx-auto px-4 flex h-16 items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <h1 className="text-xl font-bold tracking-tight">
+                            <span className="text-primary">Career</span>
+                            <span className="text-foreground">Fix</span>
+                            <span className="text-muted-foreground">.AI</span>
+                        </h1>
                     </div>
+
+                    <nav className="flex items-center gap-4">
+                        {user ? (
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                                    <User className="h-4 w-4" />
+                                    <span className="hidden sm:inline-block">{user.displayName || user.email}</span>
+                                </div>
+                                <button
+                                    onClick={handleSignOut}
+                                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+                                >
+                                    <LogOut className="mr-2 h-4 w-4 sm:hidden" />
+                                    <span className="hidden sm:inline">Sign Out</span>
+                                    <span className="sm:hidden">Sign Out</span>
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => openAuthModal('signin')}
+                                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+                                >
+                                    Sign In
+                                </button>
+                                <button
+                                    onClick={() => openAuthModal('signup')}
+                                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2"
+                                >
+                                    Sign Up
+                                </button>
+                            </div>
+                        )}
+                    </nav>
                 </div>
             </header>
 
