@@ -108,13 +108,13 @@ const RoadmapHistory = ({ onSelectRoadmap, refreshTrigger }) => {
     };
 
     return (
-        <div className="mt-16 w-full max-w-4xl mx-auto">
+        <div className="w-full  mx-auto">
             <h3 className="mb-6 flex items-center gap-2 text-xl font-bold">
                 <History className="h-5 w-5" />
                 Your Roadmap History
             </h3>
 
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-3">
                 {roadmaps.map((roadmap, index) => (
                     <div
                         key={roadmap.id}

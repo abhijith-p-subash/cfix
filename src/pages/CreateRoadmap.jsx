@@ -58,13 +58,6 @@ const CreateRoadmap = () => {
                             onRoadmapGenerated={handleRoadmapGenerated}
                             onFocusChange={setFocusedField}
                         />
-
-                        <div className="pt-10">
-                            <RoadmapHistory
-                                onSelectRoadmap={handleSelectHistoryRoadmap}
-                                refreshTrigger={refreshKey}
-                            />
-                        </div>
                     </div>
 
                     {/* Right Column: Sticky Result (7 cols) */}
@@ -83,6 +76,13 @@ const CreateRoadmap = () => {
                                 </div>
                             )}
                         </div>
+                    </div>
+
+                    <div className="lg:col-span-12">
+                        <RoadmapHistory
+                            onSelectRoadmap={handleSelectHistoryRoadmap}
+                            refreshTrigger={refreshKey}
+                        />
                     </div>
                 </div>
 
