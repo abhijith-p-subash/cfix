@@ -1,6 +1,8 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+const ai = new GoogleGenAI({
+    apiKey: import.meta.env.VITE_GEMINI_API_KEY
+});
 
 /**
  * Generate career roadmap using Gemini AI
@@ -46,11 +48,12 @@ Please provide a comprehensive career roadmap that includes:
 
 Format the response in clear, well-structured markdown with headers, bullet points, and emphasis where appropriate. Be specific, actionable, and encouraging. Focus on practical steps the person can take.`;
 
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const roadmap = response.text();
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.0-flash',
+            contents: prompt
+        });
 
+        const roadmap = response.text;
         return roadmap;
     } catch (error) {
         console.error('Error generating roadmap:', error);
