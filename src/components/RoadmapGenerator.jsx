@@ -7,7 +7,7 @@ import {
     incrementUserUsage
 } from '../services/usageService';
 import { generateCareerRoadmap, saveRoadmap } from '../services/aiService';
-import { Sparkles, Loader2 } from 'lucide-react';
+import { Sparkles, Loader2, Lightbulb, ArrowRight, HelpCircle } from 'lucide-react';
 
 const RoadmapGenerator = ({ onRoadmapGenerated }) => {
     const { user } = useAuth();
@@ -109,15 +109,30 @@ const RoadmapGenerator = ({ onRoadmapGenerated }) => {
     };
 
     const fieldHelp = {
-        currentRole: "Examples: Student, Graduate, Career Changer, Beginner, Junior Developer, etc.",
-        careerGoal: "Popular roles: Software Engineer, Data Scientist, UX Designer, Product Manager, DevOps Engineer",
-        skills: "List any skills (technical or soft skills). If you're just starting, you can write 'Beginner' or leave blank",
-        timeline: "Choose based on how much time you can dedicate to learning",
-        additionalInfo: "Share your interests, constraints, or preferences (e.g., 'Interested in AI', 'Part-time only', 'Remote work preferred')"
+        currentRole: {
+            title: "Current Status",
+            text: "Examples: Student, Graduate, Career Changer, Beginner, Junior Developer, etc."
+        },
+        careerGoal: {
+            title: "Target Role",
+            text: "Popular roles: Software Engineer, Data Scientist, UX Designer, Product Manager, DevOps Engineer"
+        },
+        skills: {
+            title: "Your Skills",
+            text: "List any skills (technical or soft skills). If you're just starting, you can write 'Beginner' or leave blank"
+        },
+        timeline: {
+            title: "Time Commitment",
+            text: "Choose based on how much time you can dedicate to learning"
+        },
+        additionalInfo: {
+            title: "Extra Details",
+            text: "Share your interests, constraints, or preferences (e.g., 'Interested in AI', 'Part-time only', 'Remote work preferred')"
+        }
     };
 
     return (
-        <div className="w-full max-w-3xl mx-auto rounded-xl border bg-card p-8 shadow-sm">
+        <div className="w-full max-w-5xl mx-auto">
             <div className="mb-8 text-center">
                 <h2 className="mb-2 text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                     Build Your Career Roadmap
@@ -127,150 +142,187 @@ const RoadmapGenerator = ({ onRoadmapGenerated }) => {
                 </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid gap-6 md:grid-cols-2">
-                    <div className="space-y-2">
-                        <label htmlFor="currentRole" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Where are you now?
-                        </label>
-                        <input
-                            id="currentRole"
-                            name="currentRole"
-                            type="text"
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                            value={formData.currentRole}
-                            onChange={handleChange}
-                            onFocus={() => handleFocus('currentRole')}
-                            onBlur={handleBlur}
-                            placeholder="e.g., Student, Graduate, Career Changer..."
-                            required
-                        />
-                        {focusedField === 'currentRole' && (
-                            <div className="mt-2 rounded-md border-l-4 border-primary bg-secondary/50 p-3 text-sm text-primary animate-in slide-in-from-top-2 fade-in duration-200">
-                                {fieldHelp.currentRole}
+            <div className="grid gap-8 md:grid-cols-3 items-start">
+                {/* Left Column: Form */}
+                <div className="md:col-span-2 rounded-xl border bg-card p-6 shadow-sm md:p-8">
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="grid gap-6 md:grid-cols-2">
+                            <div className="space-y-2 relative">
+                                <label htmlFor="currentRole" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                    Where are you now?
+                                </label>
+                                <input
+                                    id="currentRole"
+                                    name="currentRole"
+                                    type="text"
+                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                    value={formData.currentRole}
+                                    onChange={handleChange}
+                                    onFocus={() => handleFocus('currentRole')}
+                                    onBlur={handleBlur}
+                                    placeholder="e.g., Student, Graduate..."
+                                    required
+                                />
+                                {/* Mobile Hint (Absolute) */}
+                                {focusedField === 'currentRole' && (
+                                    <div className="absolute left-0 top-full z-10 mt-1 w-full rounded-md border bg-popover p-2 text-xs text-popover-foreground shadow-md md:hidden animate-in fade-in zoom-in-95 duration-200">
+                                        {fieldHelp.currentRole.text}
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="space-y-2 relative">
+                                <label htmlFor="careerGoal" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                    Dream Career Goal?
+                                </label>
+                                <input
+                                    id="careerGoal"
+                                    name="careerGoal"
+                                    type="text"
+                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                    value={formData.careerGoal}
+                                    onChange={handleChange}
+                                    onFocus={() => handleFocus('careerGoal')}
+                                    onBlur={handleBlur}
+                                    placeholder="e.g., Software Developer..."
+                                    required
+                                />
+                                {focusedField === 'careerGoal' && (
+                                    <div className="absolute left-0 top-full z-10 mt-1 w-full rounded-md border bg-popover p-2 text-xs text-popover-foreground shadow-md md:hidden animate-in fade-in zoom-in-95 duration-200">
+                                        {fieldHelp.careerGoal.text}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="space-y-2 relative">
+                            <label htmlFor="skills" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                Skills You Have <span className="text-xs font-normal italic text-muted-foreground">(optional)</span>
+                            </label>
+                            <input
+                                id="skills"
+                                name="skills"
+                                type="text"
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                value={formData.skills}
+                                onChange={handleChange}
+                                onFocus={() => handleFocus('skills')}
+                                onBlur={handleBlur}
+                                placeholder="e.g., Python, Communication, or 'Beginner'"
+                            />
+                            {focusedField === 'skills' && (
+                                <div className="absolute left-0 top-full z-10 mt-1 w-full rounded-md border bg-popover p-2 text-xs text-popover-foreground shadow-md md:hidden animate-in fade-in zoom-in-95 duration-200">
+                                    {fieldHelp.skills.text}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="space-y-2 relative">
+                            <label htmlFor="timeline" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                Timeline to Achieve Goal
+                            </label>
+                            <select
+                                id="timeline"
+                                name="timeline"
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                value={formData.timeline}
+                                onChange={handleChange}
+                                onFocus={() => handleFocus('timeline')}
+                                onBlur={handleBlur}
+                                required
+                            >
+                                <option value="">Select timeline...</option>
+                                <option value="6 months">6 months</option>
+                                <option value="1 year">1 year</option>
+                                <option value="2 years">2 years</option>
+                                <option value="3+ years">3+ years</option>
+                            </select>
+                            {focusedField === 'timeline' && (
+                                <div className="absolute left-0 top-full z-10 mt-1 w-full rounded-md border bg-popover p-2 text-xs text-popover-foreground shadow-md md:hidden animate-in fade-in zoom-in-95 duration-200">
+                                    {fieldHelp.timeline.text}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="space-y-2 relative">
+                            <label htmlFor="additionalInfo" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                Additional Details <span className="text-xs font-normal italic text-muted-foreground">(optional)</span>
+                            </label>
+                            <textarea
+                                id="additionalInfo"
+                                name="additionalInfo"
+                                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                value={formData.additionalInfo}
+                                onChange={handleChange}
+                                onFocus={() => handleFocus('additionalInfo')}
+                                onBlur={handleBlur}
+                                placeholder="Any interests, constraints, or preferences..."
+                                rows={3}
+                            />
+                            {focusedField === 'additionalInfo' && (
+                                <div className="absolute left-0 top-full z-10 mt-1 w-full rounded-md border bg-popover p-2 text-xs text-popover-foreground shadow-md md:hidden animate-in fade-in zoom-in-95 duration-200">
+                                    {fieldHelp.additionalInfo.text}
+                                </div>
+                            )}
+                        </div>
+
+                        {error && (
+                            <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+                                {error}
+                            </div>
+                        )}
+
+                        <button
+                            type="submit"
+                            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 w-full text-lg shadow-md hover:shadow-lg transition-all"
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                    Generating Your Roadmap...
+                                </>
+                            ) : (
+                                <>
+                                    <Sparkles className="mr-2 h-5 w-5" />
+                                    Generate My Roadmap
+                                </>
+                            )}
+                        </button>
+                    </form>
+                </div>
+
+                {/* Right Column: Sticky Guide Panel (Desktop Only) */}
+                <div className="hidden md:block md:col-span-1">
+                    <div className="sticky top-24 rounded-xl border bg-card p-6 shadow-sm transition-all duration-300">
+                        <div className="flex items-center gap-2 mb-4 text-primary">
+                            <Lightbulb className="h-5 w-5" />
+                            <h3 className="font-semibold">AI Assistant Guide</h3>
+                        </div>
+
+                        {focusedField ? (
+                            <div className="animate-in fade-in slide-in-from-left-2 duration-300">
+                                <h4 className="text-sm font-medium text-foreground mb-2">
+                                    {fieldHelp[focusedField].title}
+                                </h4>
+                                <p className="text-sm text-muted-foreground leading-relaxed">
+                                    {fieldHelp[focusedField].text}
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="text-sm text-muted-foreground">
+                                <p className="mb-4">
+                                    Fill out the form to get your personalized career roadmap.
+                                </p>
+                                <div className="flex items-center gap-2 text-xs opacity-70">
+                                    <HelpCircle className="h-4 w-4" />
+                                    <span>Click on any field for tips!</span>
+                                </div>
                             </div>
                         )}
                     </div>
-
-                    <div className="space-y-2">
-                        <label htmlFor="careerGoal" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Dream Career Goal?
-                        </label>
-                        <input
-                            id="careerGoal"
-                            name="careerGoal"
-                            type="text"
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                            value={formData.careerGoal}
-                            onChange={handleChange}
-                            onFocus={() => handleFocus('careerGoal')}
-                            onBlur={handleBlur}
-                            placeholder="e.g., Software Developer, Data Analyst..."
-                            required
-                        />
-                        {focusedField === 'careerGoal' && (
-                            <div className="mt-2 rounded-md border-l-4 border-primary bg-secondary/50 p-3 text-sm text-primary animate-in slide-in-from-top-2 fade-in duration-200">
-                                {fieldHelp.careerGoal}
-                            </div>
-                        )}
-                    </div>
                 </div>
-
-                <div className="space-y-2">
-                    <label htmlFor="skills" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                        Skills You Have <span className="text-xs font-normal italic text-muted-foreground">(optional)</span>
-                    </label>
-                    <input
-                        id="skills"
-                        name="skills"
-                        type="text"
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        value={formData.skills}
-                        onChange={handleChange}
-                        onFocus={() => handleFocus('skills')}
-                        onBlur={handleBlur}
-                        placeholder="e.g., Python, Communication, or 'Beginner'"
-                    />
-                    {focusedField === 'skills' && (
-                        <div className="mt-2 rounded-md border-l-4 border-primary bg-secondary/50 p-3 text-sm text-primary animate-in slide-in-from-top-2 fade-in duration-200">
-                            {fieldHelp.skills}
-                        </div>
-                    )}
-                </div>
-
-                <div className="space-y-2">
-                    <label htmlFor="timeline" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                        Timeline to Achieve Goal
-                    </label>
-                    <select
-                        id="timeline"
-                        name="timeline"
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        value={formData.timeline}
-                        onChange={handleChange}
-                        onFocus={() => handleFocus('timeline')}
-                        onBlur={handleBlur}
-                        required
-                    >
-                        <option value="">Select timeline...</option>
-                        <option value="6 months">6 months</option>
-                        <option value="1 year">1 year</option>
-                        <option value="2 years">2 years</option>
-                        <option value="3+ years">3+ years</option>
-                    </select>
-                    {focusedField === 'timeline' && (
-                        <div className="mt-2 rounded-md border-l-4 border-primary bg-secondary/50 p-3 text-sm text-primary animate-in slide-in-from-top-2 fade-in duration-200">
-                            {fieldHelp.timeline}
-                        </div>
-                    )}
-                </div>
-
-                <div className="space-y-2">
-                    <label htmlFor="additionalInfo" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                        Additional Details <span className="text-xs font-normal italic text-muted-foreground">(optional)</span>
-                    </label>
-                    <textarea
-                        id="additionalInfo"
-                        name="additionalInfo"
-                        className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        value={formData.additionalInfo}
-                        onChange={handleChange}
-                        onFocus={() => handleFocus('additionalInfo')}
-                        onBlur={handleBlur}
-                        placeholder="Any interests, constraints, or preferences..."
-                        rows={3}
-                    />
-                    {focusedField === 'additionalInfo' && (
-                        <div className="mt-2 rounded-md border-l-4 border-primary bg-secondary/50 p-3 text-sm text-primary animate-in slide-in-from-top-2 fade-in duration-200">
-                            {fieldHelp.additionalInfo}
-                        </div>
-                    )}
-                </div>
-
-                {error && (
-                    <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
-                        {error}
-                    </div>
-                )}
-
-                <button
-                    type="submit"
-                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-8 w-full text-lg shadow-md hover:shadow-lg transition-all"
-                    disabled={loading}
-                >
-                    {loading ? (
-                        <>
-                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                            Generating Your Roadmap...
-                        </>
-                    ) : (
-                        <>
-                            <Sparkles className="mr-2 h-5 w-5" />
-                            Generate My Roadmap
-                        </>
-                    )}
-                </button>
-            </form>
+            </div>
         </div>
     );
 };
