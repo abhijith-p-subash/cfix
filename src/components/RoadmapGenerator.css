@@ -29,6 +29,41 @@
     gap: var(--spacing-lg);
 }
 
+.field-hint {
+    font-size: var(--font-size-sm);
+    color: var(--color-primary-light);
+    background: var(--color-surface-alt);
+    border-left: 3px solid var(--color-primary-light);
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-top: var(--spacing-sm);
+    margin-bottom: 0;
+    border-radius: var(--radius-md);
+    line-height: 1.5;
+}
+
+.field-hint.active {
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.optional-tag {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-light);
+    font-weight: 400;
+    font-style: italic;
+}
+
 .generate-btn {
     width: 100%;
     margin-top: var(--spacing-md);
@@ -44,5 +79,10 @@
     .form-row {
         grid-template-columns: 1fr;
         gap: 0;
+    }
+
+    .field-hint {
+        font-size: var(--font-size-xs);
+        padding: var(--spacing-xs) var(--spacing-sm);
     }
 }

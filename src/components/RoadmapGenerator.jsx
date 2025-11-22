@@ -21,6 +21,7 @@ const RoadmapGenerator = ({ onRoadmapGenerated }) => {
     const [lastSubmittedData, setLastSubmittedData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [focusedField, setFocusedField] = useState(null);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -30,6 +31,14 @@ const RoadmapGenerator = ({ onRoadmapGenerated }) => {
         }));
         // Clear error when user changes form
         if (error) setError('');
+    };
+
+    const handleFocus = (fieldName) => {
+        setFocusedField(fieldName);
+    };
+
+    const handleBlur = () => {
+        setFocusedField(null);
     };
 
     // Check if current form data is identical to last submission
@@ -99,12 +108,20 @@ const RoadmapGenerator = ({ onRoadmapGenerated }) => {
         }
     };
 
+    const fieldHelp = {
+        currentRole: "Examples: Student, Graduate, Career Changer, Beginner, Junior Developer, etc.",
+        careerGoal: "Popular roles: Software Engineer, Data Scientist, UX Designer, Product Manager, DevOps Engineer",
+        skills: "List any skills (technical or soft skills). If you're just starting, you can write 'Beginner' or leave blank",
+        timeline: "Choose based on how much time you can dedicate to learning",
+        additionalInfo: "Share your interests, constraints, or preferences (e.g., 'Interested in AI', 'Part-time only', 'Remote work preferred')"
+    };
+
     return (
         <div className="roadmap-generator">
             <div className="generator-header">
                 <h2>Build Your Career Roadmap</h2>
                 <p className="text-muted">
-                    Tell us about your career goals, and our AI will create a personalized roadmap to help you get there.
+                    Tell us about yourself and your goals - we'll create a personalized roadmap just for you! 🎯
                 </p>
             </div>
 
@@ -112,7 +129,7 @@ const RoadmapGenerator = ({ onRoadmapGenerated }) => {
                 <div className="form-row">
                     <div className="form-group">
                         <label htmlFor="currentRole" className="form-label">
-                            Current Role / Position
+                            Where are you now?
                         </label>
                         <input
                             id="currentRole"
@@ -121,14 +138,19 @@ const RoadmapGenerator = ({ onRoadmapGenerated }) => {
                             className="form-input"
                             value={formData.currentRole}
                             onChange={handleChange}
-                            placeholder="e.g., Junior Web Developer"
+                            onFocus={() => handleFocus('currentRole')}
+                            onBlur={handleBlur}
+                            placeholder="e.g., Student, Graduate, Career Changer..."
                             required
                         />
+                        {focusedField === 'currentRole' && (
+                            <p className="field-hint active">{fieldHelp.currentRole}</p>
+                        )}
                     </div>
 
                     <div className="form-group">
                         <label htmlFor="careerGoal" className="form-label">
-                            Career Goal / Target Role
+                            Dream Career Goal?
                         </label>
                         <input
                             id="careerGoal"
@@ -137,15 +159,20 @@ const RoadmapGenerator = ({ onRoadmapGenerated }) => {
                             className="form-input"
                             value={formData.careerGoal}
                             onChange={handleChange}
-                            placeholder="e.g., Senior Full-Stack Engineer"
+                            onFocus={() => handleFocus('careerGoal')}
+                            onBlur={handleBlur}
+                            placeholder="e.g., Software Developer, Data Analyst..."
                             required
                         />
+                        {focusedField === 'careerGoal' && (
+                            <p className="field-hint active">{fieldHelp.careerGoal}</p>
+                        )}
                     </div>
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="skills" className="form-label">
-                        Current Skills & Technologies
+                        Skills You Have <span className="optional-tag">(optional)</span>
                     </label>
                     <input
                         id="skills"
@@ -154,14 +181,18 @@ const RoadmapGenerator = ({ onRoadmapGenerated }) => {
                         className="form-input"
                         value={formData.skills}
                         onChange={handleChange}
-                        placeholder="e.g., JavaScript, React, Node.js, Git"
-                        required
+                        onFocus={() => handleFocus('skills')}
+                        onBlur={handleBlur}
+                        placeholder="e.g., Python, Communication, or 'Beginner'"
                     />
+                    {focusedField === 'skills' && (
+                        <p className="field-hint active">{fieldHelp.skills}</p>
+                    )}
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="timeline" className="form-label">
-                        Desired Timeline
+                        Timeline to Achieve Goal
                     </label>
                     <select
                         id="timeline"
@@ -169,6 +200,8 @@ const RoadmapGenerator = ({ onRoadmapGenerated }) => {
                         className="form-select"
                         value={formData.timeline}
                         onChange={handleChange}
+                        onFocus={() => handleFocus('timeline')}
+                        onBlur={handleBlur}
                         required
                     >
                         <option value="">Select timeline...</option>
@@ -177,11 +210,14 @@ const RoadmapGenerator = ({ onRoadmapGenerated }) => {
                         <option value="2 years">2 years</option>
                         <option value="3+ years">3+ years</option>
                     </select>
+                    {focusedField === 'timeline' && (
+                        <p className="field-hint active">{fieldHelp.timeline}</p>
+                    )}
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="additionalInfo" className="form-label">
-                        Additional Information (Optional)
+                        Additional Details <span className="optional-tag">(optional)</span>
                     </label>
                     <textarea
                         id="additionalInfo"
@@ -189,9 +225,14 @@ const RoadmapGenerator = ({ onRoadmapGenerated }) => {
                         className="form-textarea"
                         value={formData.additionalInfo}
                         onChange={handleChange}
-                        placeholder="Any specific interests, constraints, or preferences we should know about..."
-                        rows={4}
+                        onFocus={() => handleFocus('additionalInfo')}
+                        onBlur={handleBlur}
+                        placeholder="Any interests, constraints, or preferences..."
+                        rows={3}
                     />
+                    {focusedField === 'additionalInfo' && (
+                        <p className="field-hint active">{fieldHelp.additionalInfo}</p>
+                    )}
                 </div>
 
                 {error && (
