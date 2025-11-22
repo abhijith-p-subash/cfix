@@ -11,7 +11,7 @@ const TypewriterText = ({ text, speed = 30, onComplete }) => {
 
         const timer = setInterval(() => {
             if (index < text.length) {
-                setDisplayedText((prev) => prev + text.charAt(index));
+                setDisplayedText(text.slice(0, index + 1));
                 index++;
             } else {
                 clearInterval(timer);
