@@ -59,7 +59,7 @@ const CreateRoadmap = () => {
                             onFocusChange={setFocusedField}
                         />
 
-                        <div className="pt-10 border-t">
+                        <div className="pt-10">
                             <RoadmapHistory
                                 onSelectRoadmap={handleSelectHistoryRoadmap}
                                 refreshTrigger={refreshKey}

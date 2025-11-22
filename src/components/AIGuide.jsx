@@ -32,7 +32,7 @@ const AIGuide = ({ focusedField }) => {
             <div className="rounded-xl border bg-card p-6 shadow-xl ring-1 ring-black/5">
                 <div className="flex items-center gap-2 mb-3 text-primary">
                     <Lightbulb className="h-5 w-5" />
-                    <h3 className="font-semibold">AI Assistant</h3>
+                    <h3 className="font-semibold">Assistant</h3>
                 </div>
 
                 <h4 className="text-sm font-medium text-foreground mb-2">
