@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { logOut } from '../services/authService';
 import AuthModal from './AuthModal';
@@ -26,12 +27,23 @@ const Header = () => {
         <>
             <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                 <div className="container mx-auto px-4 flex h-16 items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <h1 className="text-xl font-bold tracking-tight">
-                            <span className="text-primary">Career</span>
-                            <span className="text-foreground">Fix</span>
-                            <span className="text-muted-foreground">.AI</span>
-                        </h1>
+                    <div className="flex items-center gap-6">
+                        <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                            <h1 className="text-xl font-bold tracking-tight">
+                                <span className="text-primary">Career</span>
+                                <span className="text-foreground">Fix</span>
+                                <span className="text-muted-foreground">.AI</span>
+                            </h1>
+                        </Link>
+
+                        <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+                            <Link to="/" className="text-foreground/60 transition-colors hover:text-foreground/80">
+                                Home
+                            </Link>
+                            <Link to="/create" className="text-foreground/60 transition-colors hover:text-foreground/80">
+                                Create Roadmap
+                            </Link>
+                        </nav>
                     </div>
 
                     <nav className="flex items-center gap-4">

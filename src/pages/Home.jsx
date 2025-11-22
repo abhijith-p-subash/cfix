@@ -1,47 +1,15 @@
-import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Header from '../components/Header';
-import UsageIndicator from '../components/UsageIndicator';
-import RoadmapGenerator from '../components/RoadmapGenerator';
-import RoadmapDisplay from '../components/RoadmapDisplay';
-import RoadmapHistory from '../components/RoadmapHistory';
-import { Target, Rocket, TrendingUp } from 'lucide-react';
+import { Target, Rocket, TrendingUp, ArrowRight } from 'lucide-react';
 
 const Home = () => {
-    const [generatedRoadmap, setGeneratedRoadmap] = useState(null);
-    const [userInputs, setUserInputs] = useState(null);
-    const [refreshKey, setRefreshKey] = useState(0);
-
-    const handleRoadmapGenerated = (roadmap, inputs) => {
-        setGeneratedRoadmap(roadmap);
-        setUserInputs(inputs);
-
-        // Trigger usage indicator refresh
-        setRefreshKey(prev => prev + 1);
-
-        // Scroll to roadmap display
-        setTimeout(() => {
-            document.getElementById('roadmap-result')?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }, 100);
-    };
-
-    const handleSelectHistoryRoadmap = (roadmap) => {
-        setGeneratedRoadmap(roadmap.content);
-        setUserInputs(roadmap.userInputs);
-
-        // Scroll to roadmap display
-        setTimeout(() => {
-            document.getElementById('roadmap-result')?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }, 100);
-    };
-
     return (
-        <div className="min-h-screen bg-background font-sans text-foreground">
+        <div className="relative min-h-screen bg-background font-sans text-foreground overflow-hidden">
+            {/* Dynamic Background */}
+            <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
+                <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-primary/20 opacity-20 blur-[100px]"></div>
+            </div>
+
             <Header />
 
             <section className="py-20 md:py-32">
@@ -57,7 +25,17 @@ const Home = () => {
                             Get a personalized career roadmap powered by advanced AI. Transform your career aspirations into actionable steps with expert guidance tailored to your goals.
                         </p>
 
-                        <div className="mt-10 flex flex-wrap justify-center gap-8 text-sm font-medium text-muted-foreground">
+                        <div className="mt-10 flex justify-center">
+                            <Link
+                                to="/create"
+                                className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-3 text-lg font-semibold text-primary-foreground shadow-lg transition-all hover:bg-primary/90 hover:shadow-xl hover:scale-105"
+                            >
+                                Start Your Journey
+                                <ArrowRight className="ml-2 h-5 w-5" />
+                            </Link>
+                        </div>
+
+                        <div className="mt-12 flex flex-wrap justify-center gap-8 text-sm font-medium text-muted-foreground">
                             <div className="flex items-center gap-2">
                                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
                                     <Target className="h-4 w-4" />
@@ -81,26 +59,7 @@ const Home = () => {
                 </div>
             </section>
 
-            <section className="pb-20">
-                <div className="container mx-auto px-4 max-w-3xl">
-                    <UsageIndicator refreshTrigger={refreshKey} />
-                    <RoadmapGenerator onRoadmapGenerated={handleRoadmapGenerated} />
-                    <RoadmapHistory
-                        onSelectRoadmap={handleSelectHistoryRoadmap}
-                        refreshTrigger={refreshKey}
-                    />
-                </div>
-            </section>
-
-            {generatedRoadmap && (
-                <section id="roadmap-result" className="pb-20">
-                    <div className="container mx-auto px-4">
-                        <RoadmapDisplay roadmap={generatedRoadmap} userInputs={userInputs} />
-                    </div>
-                </section>
-            )}
-
-            <footer className="border-t py-8 text-center text-sm text-muted-foreground">
+            <footer className="border-t py-8 text-center text-sm text-muted-foreground bg-background/50 backdrop-blur-sm">
                 <div className="container mx-auto px-4">
                     <p>© 2024 CareerFix.AI - Powered by AI to build better careers</p>
                 </div>
