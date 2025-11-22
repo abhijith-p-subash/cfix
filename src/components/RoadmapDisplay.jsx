@@ -118,8 +118,9 @@ const RoadmapDisplay = ({ roadmap, userInputs }) => {
     };
 
     return (
-        <div className="w-full max-w-4xl mx-auto mt-8 rounded-xl border bg-card p-8 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="mb-8 flex flex-col justify-between gap-4 border-b pb-6 sm:flex-row sm:items-center">
+        <div className="w-full max-w-4xl mx-auto rounded-xl border bg-card shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-hidden">
+            {/* Sticky Header */}
+            <div className="sticky top-0 z-10 bg-card/95 backdrop-blur border-b p-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                 <div>
                     <h2 className="text-2xl font-bold tracking-tight">Your Career Roadmap</h2>
                     <p className="text-muted-foreground mt-1">
@@ -130,8 +131,8 @@ const RoadmapDisplay = ({ roadmap, userInputs }) => {
                 <button
                     onClick={handleDownloadPDF}
                     className={`inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 ${user
-                            ? 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-                            : 'border border-input bg-background hover:bg-accent hover:text-accent-foreground'
+                        ? 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                        : 'border border-input bg-background hover:bg-accent hover:text-accent-foreground'
                         }`}
                     disabled={!user || downloading}
                     title={!user ? 'Sign in to download PDF' : 'Download as PDF'}
@@ -151,24 +152,27 @@ const RoadmapDisplay = ({ roadmap, userInputs }) => {
                 </button>
             </div>
 
-            {!user && (
-                <div className="mb-6 rounded-md bg-muted p-4 text-sm text-muted-foreground flex items-center gap-2">
-                    <Lock className="h-4 w-4" />
-                    <p>
-                        PDF downloads are available for registered users. Sign up to save and download your roadmap!
+            {/* Scrollable Content */}
+            <div className="p-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                {!user && (
+                    <div className="mb-6 rounded-md bg-muted p-4 text-sm text-muted-foreground flex items-center gap-2">
+                        <Lock className="h-4 w-4" />
+                        <p>
+                            PDF downloads are available for registered users. Sign up to save and download your roadmap!
+                        </p>
+                    </div>
+                )}
+
+                <div className="space-y-1">
+                    {formatRoadmap(roadmap)}
+                </div>
+
+                <div className="mt-8 rounded-lg bg-primary/5 p-4 text-sm text-primary border border-primary/10">
+                    <p className="flex items-center gap-2 font-medium">
+                        <FileText className="h-4 w-4" />
+                        Pro Tip: Save this roadmap and review it monthly to track your progress!
                     </p>
                 </div>
-            )}
-
-            <div className="space-y-1">
-                {formatRoadmap(roadmap)}
-            </div>
-
-            <div className="mt-8 rounded-lg bg-primary/5 p-4 text-sm text-primary border border-primary/10">
-                <p className="flex items-center gap-2 font-medium">
-                    <FileText className="h-4 w-4" />
-                    Pro Tip: Save this roadmap and review it monthly to track your progress!
-                </p>
             </div>
         </div>
     );

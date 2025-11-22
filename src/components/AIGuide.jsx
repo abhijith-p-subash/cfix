@@ -25,33 +25,23 @@ const AIGuide = ({ focusedField }) => {
         }
     };
 
-    return (
-        <div className="rounded-xl border bg-card p-6 shadow-sm transition-all duration-300 h-full min-h-[200px]">
-            <div className="flex items-center gap-2 mb-4 text-primary">
-                <Lightbulb className="h-5 w-5" />
-                <h3 className="font-semibold">AI Assistant Guide</h3>
-            </div>
+    if (!focusedField || !fieldHelp[focusedField]) return null;
 
-            {focusedField && fieldHelp[focusedField] ? (
-                <div className="animate-in fade-in slide-in-from-left-2 duration-300">
-                    <h4 className="text-sm font-medium text-foreground mb-2">
-                        {fieldHelp[focusedField].title}
-                    </h4>
-                    <div className="text-sm text-muted-foreground leading-relaxed">
-                        <TypewriterText text={fieldHelp[focusedField].text} speed={20} />
-                    </div>
+    return (
+        <div className="fixed bottom-8 right-8 z-50 w-full max-w-sm animate-in fade-in slide-in-from-bottom-4 duration-300">
+            <div className="rounded-xl border bg-card p-6 shadow-xl ring-1 ring-black/5">
+                <div className="flex items-center gap-2 mb-3 text-primary">
+                    <Lightbulb className="h-5 w-5" />
+                    <h3 className="font-semibold">AI Assistant</h3>
                 </div>
-            ) : (
-                <div className="text-sm text-muted-foreground">
-                    <p className="mb-4">
-                        Fill out the form to get your personalized career roadmap.
-                    </p>
-                    <div className="flex items-center gap-2 text-xs opacity-70">
-                        <HelpCircle className="h-4 w-4" />
-                        <span>Click on any field for tips!</span>
-                    </div>
+
+                <h4 className="text-sm font-medium text-foreground mb-2">
+                    {fieldHelp[focusedField].title}
+                </h4>
+                <div className="text-sm text-muted-foreground leading-relaxed">
+                    <TypewriterText text={fieldHelp[focusedField].text} speed={20} />
                 </div>
-            )}
+            </div>
         </div>
     );
 };

@@ -52,8 +52,8 @@ const CreateRoadmap = () => {
                 </div>
 
                 <div className="grid gap-8 lg:grid-cols-12 items-start">
-                    {/* Left Column: Form (7 cols) */}
-                    <div className="lg:col-span-7 space-y-8">
+                    {/* Left Column: Form (5 cols) */}
+                    <div className="lg:col-span-5 space-y-8">
                         <RoadmapGenerator
                             onRoadmapGenerated={handleRoadmapGenerated}
                             onFocusChange={setFocusedField}
@@ -67,23 +67,27 @@ const CreateRoadmap = () => {
                         </div>
                     </div>
 
-                    {/* Right Column: Sticky Guide / Result (5 cols) */}
-                    <div className="lg:col-span-5">
+                    {/* Right Column: Sticky Result (7 cols) */}
+                    <div className="lg:col-span-7">
                         <div className="sticky top-24 space-y-6">
                             {generatedRoadmap ? (
                                 <section id="roadmap-result" className="animate-in fade-in slide-in-from-right-4 duration-500">
-                                    <div className="max-h-[calc(100vh-8rem)] overflow-y-auto pr-2 custom-scrollbar">
-                                        <RoadmapDisplay roadmap={generatedRoadmap} userInputs={userInputs} />
-                                    </div>
+                                    <RoadmapDisplay roadmap={generatedRoadmap} userInputs={userInputs} />
                                 </section>
                             ) : (
-                                <div className="animate-in fade-in zoom-in-95 duration-300">
-                                    <AIGuide focusedField={focusedField} />
+                                <div className="hidden lg:flex h-full min-h-[400px] items-center justify-center rounded-xl border-2 border-dashed p-12 text-center text-muted-foreground">
+                                    <div>
+                                        <h3 className="text-lg font-semibold mb-2">Ready to Plan?</h3>
+                                        <p>Fill out the form on the left to generate your personalized career roadmap.</p>
+                                    </div>
                                 </div>
                             )}
                         </div>
                     </div>
                 </div>
+
+                {/* Floating AI Guide */}
+                <AIGuide focusedField={focusedField} />
             </div>
         </div>
     );
