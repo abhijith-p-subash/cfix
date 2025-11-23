@@ -231,7 +231,7 @@ const ResumeReview = () => {
                             <button
                                 onClick={handleUpload}
                                 disabled={!file || loading || !canGenerate}
-                                className="mt-6 w-full py-2.5 px-4 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all"
+                                className="mt-6  py-2.5 px-4 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all"
                             >
                                 {loading ? (
                                     <>
@@ -382,12 +382,14 @@ const ResumeReview = () => {
                     </div>
 
                     {/* History Section (Full Width) */}
-                    <div className="lg:col-span-12 mt-8">
-                        <ResumeHistory
-                            onSelectResume={handleSelectHistory}
-                            refreshTrigger={refreshKey}
-                        />
-                    </div>
+                    {user && (
+                        <div className="lg:col-span-12 mt-8">
+                            <ResumeHistory
+                                onSelectResume={handleSelectHistory}
+                                refreshTrigger={refreshKey}
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

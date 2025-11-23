@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import UsageIndicator from '../components/UsageIndicator';
 import RoadmapGenerator from '../components/RoadmapGenerator';
@@ -8,6 +9,7 @@ import AIGuide from '../components/AIGuide';
 import Footer from '../components/Footer';
 
 const CreateRoadmap = () => {
+    const { user } = useAuth();
     const [generatedRoadmap, setGeneratedRoadmap] = useState(null);
     const [userInputs, setUserInputs] = useState(null);
     const [refreshKey, setRefreshKey] = useState(0);
@@ -79,12 +81,14 @@ const CreateRoadmap = () => {
                         </div>
                     </div>
 
-                    <div className="lg:col-span-12">
-                        <RoadmapHistory
-                            onSelectRoadmap={handleSelectHistoryRoadmap}
-                            refreshTrigger={refreshKey}
-                        />
-                    </div>
+                    {user && (
+                        <div className="lg:col-span-12">
+                            <RoadmapHistory
+                                onSelectRoadmap={handleSelectHistoryRoadmap}
+                                refreshTrigger={refreshKey}
+                            />
+                        </div>
+                    )}
                 </div>
 
                 {/* Floating AI Guide */}
