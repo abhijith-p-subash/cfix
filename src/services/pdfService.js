@@ -126,9 +126,12 @@ export const generatePDF = async (roadmapContent, userInputs) => {
 /**
  * Generate and download Resume Review PDF
  */
-export const generateResumePDF = async (reportContent, userInputs) => {
+/**
+ * Generate and download Resume Review PDF
+ */
+export const generateResumePDF = async (reportData, userInputs) => {
     try {
-        const htmlContent = marked(reportContent);
+        // reportData is now a JSON object
         const container = document.createElement('div');
         container.style.width = '190mm';
         container.style.maxWidth = '190mm';
@@ -137,6 +140,19 @@ export const generateResumePDF = async (reportContent, userInputs) => {
         container.style.fontFamily = 'Helvetica, Arial, sans-serif';
         container.style.color = '#334155';
         container.style.background = '#ffffff';
+
+        // Helper to generate score bar
+        const generateScoreBar = (score, color) => `
+            <div style="margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span style="font-weight: bold; font-size: 14px; color: #1e293b;">${score.label}</span>
+                    <span style="font-weight: bold; font-size: 14px; color: ${color};">${score.value}/100</span>
+                </div>
+                <div style="width: 100%; height: 8px; background-color: #e2e8f0; border-radius: 4px; overflow: hidden;">
+                    <div style="width: ${score.value}%; height: 100%; background-color: ${color}; border-radius: 4px;"></div>
+                </div>
+            </div>
+        `;
 
         container.innerHTML = `
             <div style="margin-bottom: 30px; border-bottom: 2px solid #1e3a8a; padding-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
@@ -150,26 +166,85 @@ export const generateResumePDF = async (reportContent, userInputs) => {
                 </div>
             </div>
 
-            <div class="roadmap-content" style="font-size: 14px; line-height: 1.6;">
-                ${htmlContent}
+            <!-- Summary Section -->
+            <div style="margin-bottom: 30px;">
+                <h2 style="color: #1e3a8a; font-size: 20px; margin-bottom: 10px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">Executive Summary</h2>
+                <p style="font-size: 14px; line-height: 1.6; color: #334155;">${reportData.summary}</p>
+            </div>
+
+            <!-- Scores Section -->
+            <div style="margin-bottom: 30px; background-color: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <h2 style="color: #1e3a8a; font-size: 18px; margin-bottom: 15px; margin-top: 0;">Performance Scores</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        ${generateScoreBar({ label: 'Overall Score', value: reportData.scores.overall }, '#3b82f6')}
+                        ${generateScoreBar({ label: 'Impact Score', value: reportData.scores.impact }, '#22c55e')}
+                    </div>
+                    <div>
+                        ${generateScoreBar({ label: 'ATS Compatibility', value: reportData.scores.ats }, '#a855f7')}
+                        ${generateScoreBar({ label: 'Content Quality', value: reportData.scores.content }, '#f59e0b')}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Analysis -->
+            <div style="margin-bottom: 30px;">
+                <h2 style="color: #1e3a8a; font-size: 20px; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">Detailed Analysis</h2>
+                
+                <div style="margin-bottom: 20px;">
+                    <h3 style="color: #0f172a; font-size: 16px; font-weight: bold; margin-bottom: 8px;">Formatting & Structure</h3>
+                    <p style="font-size: 14px; line-height: 1.6; margin: 0;">${reportData.detailedAnalysis.formatting}</p>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <h3 style="color: #0f172a; font-size: 16px; font-weight: bold; margin-bottom: 8px;">Content Quality</h3>
+                    <p style="font-size: 14px; line-height: 1.6; margin: 0;">${reportData.detailedAnalysis.content}</p>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <h3 style="color: #0f172a; font-size: 16px; font-weight: bold; margin-bottom: 8px;">Grammar & Consistency</h3>
+                    <p style="font-size: 14px; line-height: 1.6; margin: 0;">${reportData.detailedAnalysis.grammar}</p>
+                </div>
+            </div>
+
+            <!-- ATS Optimization -->
+            <div style="margin-bottom: 30px;">
+                <h2 style="color: #1e3a8a; font-size: 20px; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">ATS Optimization</h2>
+                
+                <div style="margin-bottom: 15px;">
+                    <strong style="color: #166534; font-size: 14px;">Keywords Found:</strong>
+                    <p style="font-size: 14px; margin: 5px 0 0 0;">${reportData.atsOptimization.keywordsFound.join(', ')}</p>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <strong style="color: #dc2626; font-size: 14px;">Missing Keywords:</strong>
+                    <p style="font-size: 14px; margin: 5px 0 0 0;">${reportData.atsOptimization.missingKeywords.join(', ')}</p>
+                </div>
+            </div>
+
+            <!-- Value Assessment -->
+            <div style="margin-bottom: 30px; background-color: #eff6ff; padding: 15px; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                <h2 style="color: #1e3a8a; font-size: 18px; margin-top: 0; margin-bottom: 10px;">Value Assessment</h2>
+                <div style="display: flex; justify-content: space-between;">
+                    <div>
+                        <span style="font-size: 12px; color: #64748b; text-transform: uppercase;">Estimated Salary Range</span>
+                        <p style="font-size: 18px; font-weight: bold; color: #0f172a; margin: 5px 0 0 0;">${reportData.valueAssessment.salaryRange}</p>
+                    </div>
+                    <div>
+                        <span style="font-size: 12px; color: #64748b; text-transform: uppercase;">Market Demand</span>
+                        <p style="font-size: 18px; font-weight: bold; color: #0f172a; margin: 5px 0 0 0;">${reportData.valueAssessment.marketDemand}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Improvements -->
+            <div style="margin-bottom: 30px;">
+                <h2 style="color: #1e3a8a; font-size: 20px; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">Actionable Improvements</h2>
+                <ul style="padding-left: 20px; margin: 0;">
+                    ${reportData.improvements.map(item => `<li style="font-size: 14px; line-height: 1.6; margin-bottom: 8px; color: #334155;">${item}</li>`).join('')}
+                </ul>
             </div>
         `;
-
-        const style = document.createElement('style');
-        style.innerHTML = `
-            .roadmap-content { word-break: break-word; overflow-wrap: anywhere; }
-            .roadmap-content h1 { color: #1e3a8a; font-size: 24px; margin-top: 30px; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
-            .roadmap-content h2 { color: #1e3a8a; font-size: 20px; margin-top: 25px; margin-bottom: 12px; }
-            .roadmap-content h3 { color: #0f172a; font-size: 18px; margin-top: 20px; margin-bottom: 10px; font-weight: bold; }
-            .roadmap-content h4 { color: #334155; font-size: 16px; margin-top: 15px; margin-bottom: 8px; font-weight: bold; }
-            .roadmap-content p { margin-bottom: 12px; text-align: justify; }
-            .roadmap-content ul, .roadmap-content ol { margin-bottom: 15px; padding-left: 20px; }
-            .roadmap-content li { margin-bottom: 5px; }
-            .roadmap-content strong { color: #0f172a; font-weight: bold; }
-            .roadmap-content table { width: 100%; table-layout: fixed; word-break: break-word; overflow-wrap: anywhere; }
-            .roadmap-content em { font-style: italic; color: #475569; }
-        `;
-        container.appendChild(style);
 
         const timestamp = new Date().toISOString().split('T')[0];
         const filename = `Resume_Review_${timestamp}.pdf`;

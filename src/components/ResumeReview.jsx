@@ -7,33 +7,33 @@ import {
     incrementUserResumeUsage,
     getRemainingResumeGenerations
 } from '../services/usageService';
-import { reviewResume } from '../services/aiService';
-import { generatePDF } from '../services/pdfService';
+import { reviewResume, saveResumeReview } from '../services/aiService';
+import { generateResumePDF } from '../services/pdfService';
 import ReactMarkdown from 'react-markdown';
-import * as pdfjsLib from 'pdfjs-dist';
-import { Upload, FileText, Loader2, AlertCircle, CheckCircle, Download, ArrowLeft } from 'lucide-react';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
+import pdfWorker from 'pdfjs-dist/legacy/build/pdf.worker?url';
+import { Upload, FileText, Loader2, AlertCircle, CheckCircle, Download, ArrowLeft, BarChart2, TrendingUp, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import UsageIndicator from './UsageIndicator';
+import ResumeHistory from './ResumeHistory';
 
 // Set worker source
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
 const ResumeReview = () => {
     const { user } = useAuth();
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [report, setReport] = useState('');
-    const [remaining, setRemaining] = useState(null);
+    const [report, setReport] = useState(null); // Now expects JSON object
+    const [refreshKey, setRefreshKey] = useState(0);
     const [canGenerate, setCanGenerate] = useState(true);
 
     useEffect(() => {
         checkUsage();
-    }, [user]);
+    }, [user, refreshKey]);
 
     const checkUsage = async () => {
-        const rem = await getRemainingResumeGenerations(user);
-        setRemaining(rem);
-
         if (user) {
             const allowed = await canUserResumeGenerate(user.uid);
             setCanGenerate(allowed);
@@ -78,7 +78,7 @@ const ResumeReview = () => {
 
         setLoading(true);
         setError('');
-        setReport('');
+        setReport(null);
 
         try {
             let text = '';
@@ -95,6 +95,9 @@ const ResumeReview = () => {
             const analysis = await reviewResume(text);
             setReport(analysis);
 
+            // Save to Firestore
+            await saveResumeReview(user?.uid, analysis, file.name);
+
             // Increment usage
             if (user) {
                 await incrementUserResumeUsage(user.uid);
@@ -102,7 +105,7 @@ const ResumeReview = () => {
                 await incrementGuestResumeUsage();
             }
 
-            await checkUsage();
+            setRefreshKey(prev => prev + 1);
 
         } catch (err) {
             console.error(err);
@@ -114,62 +117,73 @@ const ResumeReview = () => {
 
     const handleDownloadPDF = async () => {
         if (!report) return;
-        // We'll use a modified version of generatePDF or a new function for resumes
-        // For now, passing dummy userInputs to reuse existing function or we will update pdfService
+        if (!user) {
+            setError('Please sign in to download the PDF report.');
+            return;
+        }
+
         const dummyInputs = {
-            name: user?.displayName || (user ? 'User' : 'Guest'),
-            currentRole: 'Resume Review',
-            careerGoal: 'Career Improvement',
-            skills: 'N/A',
-            timeline: 'N/A'
+            name: user.displayName || 'User',
         };
 
-        // We might need to adapt generatePDF to handle "Resume Review" title specifically
-        // But for now let's try to reuse it or I'll update pdfService next.
-        await generatePDF(report, dummyInputs);
+        await generateResumePDF(report, dummyInputs);
     };
 
-    const MarkdownComponents = {
-        h1: ({ node, ...props }) => <h1 className="mt-8 mb-4 text-2xl font-bold text-primary border-b pb-2" {...props} />,
-        h2: ({ node, ...props }) => <h2 className="mt-6 mb-3 text-xl font-semibold text-primary" {...props} />,
-        h3: ({ node, ...props }) => <h3 className="mt-4 mb-2 text-lg font-medium text-foreground" {...props} />,
-        p: ({ node, ...props }) => <p className="mb-4 text-muted-foreground leading-relaxed" {...props} />,
-        ul: ({ node, ...props }) => <ul className="mb-4 list-disc pl-5 space-y-1 text-muted-foreground" {...props} />,
-        ol: ({ node, ...props }) => <ol className="mb-4 list-decimal pl-5 space-y-1 text-muted-foreground" {...props} />,
-        li: ({ node, ...props }) => <li className="" {...props} />,
-        strong: ({ node, ...props }) => <strong className="font-semibold text-foreground" {...props} />,
+    const handleSelectHistory = (resume) => {
+        setReport(resume.content);
+        setFile({ name: resume.fileName });
+        // Scroll to top on mobile
+        if (window.innerWidth < 768) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     };
+
+    const ScoreCard = ({ title, score, icon: Icon, color }) => (
+        <div className="bg-card border rounded-lg p-4 flex items-center justify-between shadow-sm">
+            <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-full ${color} bg-opacity-10`}>
+                    <Icon className={`w-5 h-5 ${color.replace('bg-', 'text-')}`} />
+                </div>
+                <div>
+                    <p className="text-sm text-muted-foreground font-medium">{title}</p>
+                    <p className="text-2xl font-bold">{score}/100</p>
+                </div>
+            </div>
+            <div className="w-16 h-16 relative flex items-center justify-center">
+                <svg className="w-full h-full" viewBox="0 0 36 36">
+                    <path
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        fill="none"
+                        stroke="#eee"
+                        strokeWidth="3"
+                    />
+                    <path
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                        fill="none"
+                        stroke={color.includes('green') ? '#22c55e' : color.includes('blue') ? '#3b82f6' : '#a855f7'}
+                        strokeWidth="3"
+                        strokeDasharray={`${score}, 100`}
+                        className="animate-[dash_1s_ease-in-out_forwards]"
+                    />
+                </svg>
+            </div>
+        </div>
+    );
 
     return (
         <div className="min-h-screen bg-background pt-24 pb-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
-                <div className="mb-8 flex items-center justify-between">
-                    <div>
-                        <Link to="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4 transition-colors">
-                            <ArrowLeft className="w-4 h-4 mr-1" />
-                            Back to Home
-                        </Link>
-                        <h1 className="text-3xl font-bold text-foreground">AI Resume Review</h1>
-                        <p className="text-muted-foreground mt-2">
-                            Get detailed feedback, ATS scores, and salary estimates for your resume.
-                        </p>
-                    </div>
-                    <div className="text-right">
-                        <div className="inline-flex items-center px-3 py-1 rounded-full bg-secondary text-secondary-foreground text-sm font-medium">
-                            {remaining !== null ? `${remaining} free reviews left` : 'Checking limits...'}
-                        </div>
-                    </div>
+            <div className="max-w-7xl mx-auto">
+                <div className="mb-8">
+                    <UsageIndicator refreshTrigger={refreshKey} />
                 </div>
 
-                {!report ? (
-                    <div className="bg-card border rounded-xl p-8 shadow-sm text-center">
-                        <div className="max-w-md mx-auto">
-                            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <Upload className="w-8 h-8 text-primary" />
-                            </div>
-                            <h2 className="text-xl font-semibold mb-2">Upload your Resume</h2>
-                            <p className="text-muted-foreground mb-6">
-                                Upload your resume in PDF or Text format to get an instant AI analysis.
+                <div className="grid gap-8 lg:grid-cols-12 items-start">
+                    {/* Left Column: Upload & Controls (5 cols) */}
+                    <div className="lg:col-span-5 space-y-6">
+                        <div className="bg-card border rounded-xl p-6 shadow-sm">
+                            <h2 className="text-xl font-semibold mb-2">Upload Resume</h2>
+                            <p className="text-muted-foreground mb-6 text-sm">
+                                Upload your resume (PDF/TXT) for instant AI analysis.
                             </p>
 
                             <div className="relative">
@@ -189,10 +203,13 @@ const ResumeReview = () => {
                                     {file ? (
                                         <div className="flex items-center justify-center text-primary">
                                             <FileText className="w-6 h-6 mr-2" />
-                                            <span className="font-medium">{file.name}</span>
+                                            <span className="font-medium truncate max-w-[200px]">{file.name}</span>
                                         </div>
                                     ) : (
-                                        <span className="text-muted-foreground">Click to select file</span>
+                                        <span className="text-muted-foreground flex flex-col items-center">
+                                            <Upload className="w-8 h-8 mb-2 text-muted-foreground/50" />
+                                            Click to select file
+                                        </span>
                                     )}
                                 </label>
                             </div>
@@ -207,7 +224,7 @@ const ResumeReview = () => {
                             {!canGenerate && !error && (
                                 <div className="mt-4 p-3 bg-yellow-500/10 text-yellow-600 rounded-lg flex items-center justify-center text-sm">
                                     <AlertCircle className="w-4 h-4 mr-2" />
-                                    You have reached your free limit. {user ? 'Please contact support for more.' : 'Sign in to get more free reviews.'}
+                                    Limit reached. {user ? 'Upgrade for more.' : 'Sign in for more.'}
                                 </div>
                             )}
 
@@ -219,7 +236,7 @@ const ResumeReview = () => {
                                 {loading ? (
                                     <>
                                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                        Analyzing Resume...
+                                        Analyzing...
                                     </>
                                 ) : (
                                     'Analyze Resume'
@@ -227,42 +244,129 @@ const ResumeReview = () => {
                             </button>
                         </div>
                     </div>
-                ) : (
-                    <div className="space-y-6">
-                        <div className="flex items-center justify-between bg-green-500/10 text-green-600 p-4 rounded-lg border border-green-500/20">
-                            <div className="flex items-center">
-                                <CheckCircle className="w-5 h-5 mr-2" />
-                                <span className="font-medium">Analysis Complete!</span>
+
+                    {/* Right Column: Report Display (7 cols) */}
+                    <div className="lg:col-span-7">
+                        {report ? (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                {/* Scores Section */}
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <ScoreCard
+                                        title="Overall Score"
+                                        score={report.scores.overall}
+                                        icon={Award}
+                                        color="bg-blue-500"
+                                    />
+                                    <ScoreCard
+                                        title="Impact"
+                                        score={report.scores.impact}
+                                        icon={TrendingUp}
+                                        color="bg-green-500"
+                                    />
+                                    <ScoreCard
+                                        title="ATS Friendly"
+                                        score={report.scores.ats}
+                                        icon={CheckCircle}
+                                        color="bg-purple-500"
+                                    />
+                                </div>
+
+                                {/* Main Report */}
+                                <div className="bg-card border rounded-xl p-6 shadow-sm space-y-6">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <h2 className="text-2xl font-bold text-foreground">Analysis Report</h2>
+                                            <p className="text-muted-foreground text-sm mt-1">{report.summary}</p>
+                                        </div>
+                                        <button
+                                            onClick={handleDownloadPDF}
+                                            className="flex items-center text-sm font-medium text-primary hover:underline"
+                                        >
+                                            <Download className="w-4 h-4 mr-1" />
+                                            Download PDF
+                                        </button>
+                                    </div>
+
+                                    <hr className="border-border" />
+
+                                    {/* Detailed Analysis */}
+                                    <div>
+                                        <h3 className="text-lg font-semibold mb-3">Detailed Analysis</h3>
+                                        <div className="grid gap-4 sm:grid-cols-2">
+                                            <div className="bg-secondary/30 p-4 rounded-lg">
+                                                <h4 className="font-medium text-sm mb-1">Formatting</h4>
+                                                <p className="text-sm text-muted-foreground">{report.detailedAnalysis.formatting}</p>
+                                            </div>
+                                            <div className="bg-secondary/30 p-4 rounded-lg">
+                                                <h4 className="font-medium text-sm mb-1">Content Quality</h4>
+                                                <p className="text-sm text-muted-foreground">{report.detailedAnalysis.content}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* ATS Optimization */}
+                                    <div>
+                                        <h3 className="text-lg font-semibold mb-3">ATS Optimization</h3>
+                                        <div className="space-y-3">
+                                            <div>
+                                                <span className="text-sm font-medium text-green-600">Keywords Found: </span>
+                                                <span className="text-sm text-muted-foreground">{report.atsOptimization.keywordsFound.join(', ')}</span>
+                                            </div>
+                                            <div>
+                                                <span className="text-sm font-medium text-red-500">Missing Keywords: </span>
+                                                <span className="text-sm text-muted-foreground">{report.atsOptimization.missingKeywords.join(', ')}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Value Assessment */}
+                                    <div className="bg-primary/5 p-4 rounded-lg border border-primary/10">
+                                        <h3 className="text-lg font-semibold mb-2 text-primary">Value Assessment</h3>
+                                        <div className="flex flex-col sm:flex-row sm:justify-between gap-4">
+                                            <div>
+                                                <p className="text-xs text-muted-foreground uppercase tracking-wide">Est. Salary Range</p>
+                                                <p className="text-lg font-bold">{report.valueAssessment.salaryRange}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-muted-foreground uppercase tracking-wide">Market Demand</p>
+                                                <p className="text-lg font-bold">{report.valueAssessment.marketDemand}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Improvements */}
+                                    <div>
+                                        <h3 className="text-lg font-semibold mb-3">Actionable Improvements</h3>
+                                        <ul className="space-y-2">
+                                            {report.improvements.map((item, i) => (
+                                                <li key={i} className="flex items-start text-sm text-muted-foreground">
+                                                    <span className="mr-2 mt-1 text-primary">•</span>
+                                                    {item}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
-                            <button
-                                onClick={handleDownloadPDF}
-                                className="flex items-center text-sm font-medium hover:underline"
-                            >
-                                <Download className="w-4 h-4 mr-1" />
-                                Download Report
-                            </button>
-                        </div>
-
-                        <div className="bg-card border rounded-xl p-8 shadow-sm roadmap-content">
-                            <ReactMarkdown components={MarkdownComponents}>
-                                {report}
-                            </ReactMarkdown>
-                        </div>
-
-                        <div className="text-center">
-                            <button
-                                onClick={() => {
-                                    setReport('');
-                                    setFile(null);
-                                    checkUsage();
-                                }}
-                                className="text-primary hover:underline text-sm font-medium"
-                            >
-                                Analyze Another Resume
-                            </button>
-                        </div>
+                        ) : (
+                            <div className="hidden lg:flex h-full min-h-[400px] items-center justify-center rounded-xl border-2 border-dashed p-12 text-center text-muted-foreground">
+                                <div>
+                                    <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground/30" />
+                                    <h3 className="text-lg font-semibold mb-2">Ready to Review?</h3>
+                                    <p>Upload your resume on the left to get a detailed analysis.</p>
+                                </div>
+                            </div>
+                        )}
                     </div>
-                )}
+
+                    {/* History Section (Full Width) */}
+                    <div className="lg:col-span-12 mt-8">
+                        <ResumeHistory
+                            onSelectResume={handleSelectHistory}
+                            refreshTrigger={refreshKey}
+                        />
+                    </div>
+                </div>
             </div>
         </div>
     );

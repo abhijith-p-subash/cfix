@@ -103,47 +103,76 @@ export const reviewResume = async (resumeText) => {
 Resume Text:
 ${resumeText}
 
-Please analyze the resume and provide a detailed report in standard markdown format. Do NOT use code blocks. Use bold text for emphasis.
+Please analyze the resume and provide the response in the following JSON format ONLY. Do not include any markdown formatting outside the JSON object.
 
-The report MUST include the following sections:
+{
+  "scores": {
+    "overall": 0-100,
+    "impact": 0-100, // How well results are demonstrated
+    "ats": 0-100, // Estimated ATS compatibility
+    "formatting": 0-100,
+    "content": 0-100
+  },
+  "summary": "Brief professional summary of the candidate (2-3 sentences)",
+  "detailedAnalysis": {
+    "formatting": "Critique of layout, readability, and organization",
+    "content": "Evaluation of clarity, bullet points, and action verbs",
+    "grammar": "Identification of typos or errors"
+  },
+  "atsOptimization": {
+    "keywordsFound": ["list", "of", "keywords"],
+    "missingKeywords": ["list", "of", "missing", "keywords"],
+    "formattingIssues": ["list", "of", "issues"]
+  },
+  "valueAssessment": {
+    "salaryRange": "e.g. $80k - $120k",
+    "marketDemand": "Assessment of demand"
+  },
+  "improvements": [
+    "Specific actionable improvement 1",
+    "Specific actionable improvement 2"
+  ],
+  "bestPractices": [
+    "Tip 1",
+    "Tip 2"
+  ]
+}
 
-1. **Executive Summary & Scores**
-   - **Overall Score**: (0-100)
-   - **Impact Score**: (High/Medium/Low) - How well the resume demonstrates results.
-   - **ATS Compatibility Score**: (0-100) - Estimate based on formatting and keyword usage.
-   - Brief summary of the candidate's profile (2-3 sentences).
-
-2. **Detailed Analysis**
-   - **Formatting & Structure**: Critique the layout, readability, and organization.
-   - **Content Quality**: Evaluate the clarity, strength of bullet points, and use of action verbs.
-   - **Grammar & Consistency**: Identify typos, grammatical errors, or inconsistencies.
-
-3. **ATS Optimization**
-   - **Keywords Found**: List strong industry-relevant keywords present.
-   - **Missing Keywords**: Suggest critical keywords that are missing based on the candidate's likely target role.
-   - **Formatting Issues**: Highlight any elements that might confuse ATS (e.g., tables, graphics).
-
-4. **Value Assessment**
-   - **Estimated Salary Range**: Provide a realistic salary range (e.g., $80k - $120k) based on the experience level and skills shown. Mention that this varies by location (e.g., "In major tech hubs like SF/NY...").
-   - **Market Demand**: Assess the current demand for this profile.
-
-5. **Actionable Improvements**
-   - Provide a numbered list of specific, high-impact changes to improve the resume immediately.
-   - Suggest specific rewrites for weak bullet points.
-
-6. **Best Practices & Tips**
-   - General advice for tailoring this resume for specific job applications.
-
-Format the output clearly with headers (#, ##) and bullet points. Be honest but encouraging.`;
+Be honest, critical, yet encouraging. Ensure the JSON is valid.`;
 
         const response = await ai.models.generateContent({
             model: 'gemini-2.0-flash',
             contents: prompt
         });
 
-        return response.candidates[0].content.parts[0].text;
+        const text = response.candidates[0].content.parts[0].text;
+        // Clean up potential markdown code blocks if the model adds them
+        const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim();
+        return JSON.parse(jsonString);
     } catch (error) {
         console.error('Error reviewing resume:', error);
         throw new Error('Failed to review resume. Please try again.');
+    }
+};
+
+/**
+ * Save resume review to Firestore
+ */
+export const saveResumeReview = async (userId, reviewData, fileName) => {
+    try {
+        const { db } = await import('../config/firebase');
+        const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
+        const { getGuestId } = await import('./migrationService');
+
+        const effectiveUserId = userId || getGuestId();
+
+        await addDoc(collection(db, 'resumes'), {
+            userId: effectiveUserId,
+            content: reviewData, // This is now a JSON object
+            fileName,
+            createdAt: serverTimestamp()
+        });
+    } catch (error) {
+        console.error('Error saving resume review:', error);
     }
 };
