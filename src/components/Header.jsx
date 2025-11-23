@@ -30,9 +30,8 @@ const Header = () => {
                     <div className="flex items-center gap-6">
                         <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                             <h1 className="text-xl font-bold tracking-tight">
-                                <span className="text-primary">Career</span>
-                                <span className="text-foreground">Fix</span>
-                                <span className="text-muted-foreground">.AI</span>
+                                <span className="text-primary">CareerFix</span>
+                                <span className="text-foreground">AI</span>
                             </h1>
                         </Link>
 

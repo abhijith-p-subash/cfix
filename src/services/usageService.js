@@ -328,5 +328,5 @@ export const getRemainingResumeGenerations = async (user) => {
     }
 
     const usage = await getUserResumeUsage(user.uid);
-    return usage.maxFree - usage.count;
+    return Math.max(0, usage.maxFree - usage.count);
 };

@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { onAuthChange } from '../services/authService';
-import { migrateGuestRoadmaps } from '../services/migrationService';
+import { migrateGuestRoadmaps, migrateGuestResumes } from '../services/migrationService';
 
 const AuthContext = createContext({});
 
@@ -19,11 +19,14 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const unsubscribe = onAuthChange(async (user) => {
             if (user) {
-                // User just logged in - migrate any guest roadmaps
+                // User just logged in - migrate any guest data
                 try {
-                    await migrateGuestRoadmaps(user.uid);
+                    await Promise.all([
+                        migrateGuestRoadmaps(user.uid),
+                        migrateGuestResumes(user.uid)
+                    ]);
                 } catch (error) {
-                    console.error('Error during roadmap migration:', error);
+                    console.error('Error during migration:', error);
                 }
             }
             setUser(user);
