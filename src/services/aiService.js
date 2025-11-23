@@ -98,47 +98,51 @@ export const saveRoadmap = async (userId, roadmapContent, userInputs) => {
  */
 export const reviewResume = async (resumeText) => {
     try {
-        const prompt = `You are an expert Career Coach and HR Specialist with decades of experience in recruitment and talent acquisition. Your task is to provide a comprehensive, critical, and constructive review of the following resume text.
+        const prompt = `You are a Senior Career Coach and Executive Recruiter with 20+ years of experience at top-tier tech and Fortune 500 companies. You have reviewed thousands of resumes and know exactly what hiring managers and ATS systems look for.
+
+Your task is to provide a deeply critical, yet constructive and actionable review of the following resume. Your goal is to transform this resume into a top 1% application.
 
 Resume Text:
 ${resumeText}
 
-Please analyze the resume and provide the response in the following JSON format ONLY. Do not include any markdown formatting outside the JSON object.
+Analyze the resume and provide the response in the following JSON format ONLY. Do not include any markdown formatting outside the JSON object.
 
 {
   "scores": {
     "overall": 0-100,
-    "impact": 0-100, // How well results are demonstrated
-    "ats": 0-100, // Estimated ATS compatibility
-    "formatting": 0-100,
-    "content": 0-100
+    "impact": 0-100, // Focus on quantifiable results (numbers, %, $)
+    "ats": 0-100, // Keyword optimization and formatting
+    "formatting": 0-100, // Visual hierarchy, readability, consistency
+    "content": 0-100 // Clarity, action verbs, storytelling
   },
-  "summary": "Brief professional summary of the candidate (2-3 sentences)",
+  "summary": "A professional, 2-3 sentence executive summary of the candidate's current standing and potential.",
   "detailedAnalysis": {
-    "formatting": "Critique of layout, readability, and organization",
-    "content": "Evaluation of clarity, bullet points, and action verbs",
-    "grammar": "Identification of typos or errors"
+    "formatting": "Specific critique of the layout, font choice, margins, and visual consistency. Mention if it looks modern or outdated.",
+    "content": "Deep dive into the bullet points. Are they task-based or achievement-based? Do they use strong action verbs? Is the storytelling compelling?",
+    "grammar": "Identify specific typos, grammatical errors, or inconsistent tense usage."
   },
   "atsOptimization": {
-    "keywordsFound": ["list", "of", "keywords"],
-    "missingKeywords": ["list", "of", "missing", "keywords"],
-    "formattingIssues": ["list", "of", "issues"]
+    "keywordsFound": ["list", "of", "strong", "keywords", "found"],
+    "missingKeywords": ["critical", "missing", "keywords", "for", "target", "role"],
+    "formattingIssues": ["list", "of", "ATS", "blockers", "like", "tables", "columns", "icons"]
   },
   "valueAssessment": {
-    "salaryRange": "e.g. $80k - $120k",
-    "marketDemand": "Assessment of demand"
+    "salaryRange": "e.g. $120k - $150k (based on experience & location)",
+    "marketDemand": "High/Medium/Low - with a brief explanation of the current market for this role."
   },
   "improvements": [
-    "Specific actionable improvement 1",
-    "Specific actionable improvement 2"
+    "Actionable Tip 1: Be very specific. E.g., 'Rewrite the bullet point about X to include Y metric.'",
+    "Actionable Tip 2: Focus on high-impact changes.",
+    "Actionable Tip 3: Suggest removing irrelevant sections if necessary.",
+    "Actionable Tip 4: Advice on tailoring for specific roles."
   ],
   "bestPractices": [
-    "Tip 1",
-    "Tip 2"
+    "General tip for resume excellence",
+    "Tip about LinkedIn profile alignment"
   ]
 }
 
-Be honest, critical, yet encouraging. Ensure the JSON is valid.`;
+Be specific. Avoid generic advice. If a bullet point is weak, explain WHY and suggest a fix.`;
 
         const response = await ai.models.generateContent({
             model: 'gemini-2.0-flash',

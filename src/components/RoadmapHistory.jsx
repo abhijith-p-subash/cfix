@@ -118,7 +118,8 @@ const RoadmapHistory = ({ onSelectRoadmap, refreshTrigger }) => {
                 {roadmaps.map((roadmap, index) => (
                     <div
                         key={roadmap.id}
-                        className="group relative cursor-pointer rounded-lg border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:border-primary/50"
+                        className="group relative cursor-pointer rounded-lg border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:border-primary/50 animate-in fade-in slide-in-from-bottom-4 duration-500"
+                        style={{ animationDelay: `${index * 100}ms` }}
                         onClick={() => onSelectRoadmap(roadmap)}
                     >
                         <div className="mb-4 flex items-center justify-between text-xs text-muted-foreground">

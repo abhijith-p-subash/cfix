@@ -12,7 +12,7 @@ import { generateResumePDF } from '../services/pdfService';
 import ReactMarkdown from 'react-markdown';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 import pdfWorker from 'pdfjs-dist/legacy/build/pdf.worker?url';
-import { Upload, FileText, Loader2, AlertCircle, CheckCircle, Download, ArrowLeft, BarChart2, TrendingUp, Award } from 'lucide-react';
+import { Upload, FileText, Loader2, AlertCircle, CheckCircle, Download, ArrowLeft, BarChart2, TrendingUp, Award, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import UsageIndicator from './UsageIndicator';
 import ResumeHistory from './ResumeHistory';
@@ -160,7 +160,7 @@ const ResumeReview = () => {
                     <path
                         d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                         fill="none"
-                        stroke={color.includes('green') ? '#22c55e' : color.includes('blue') ? '#3b82f6' : '#a855f7'}
+                        stroke={color.includes('green') ? '#22c55e' : color.includes('blue') ? '#3b82f6' : color.includes('purple') ? '#a855f7' : '#f59e0b'}
                         strokeWidth="3"
                         strokeDasharray={`${score}, 100`}
                         className="animate-[dash_1s_ease-in-out_forwards]"
@@ -174,7 +174,7 @@ const ResumeReview = () => {
         <div className="min-h-screen bg-background pt-24 pb-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
                 <div className="mb-8">
-                    <UsageIndicator refreshTrigger={refreshKey} />
+                    <UsageIndicator refreshTrigger={refreshKey} type="resume" />
                 </div>
 
                 <div className="grid gap-8 lg:grid-cols-12 items-start">
@@ -250,7 +250,7 @@ const ResumeReview = () => {
                         {report ? (
                             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 {/* Scores Section */}
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <ScoreCard
                                         title="Overall Score"
                                         score={report.scores.overall}
@@ -269,6 +269,12 @@ const ResumeReview = () => {
                                         icon={CheckCircle}
                                         color="bg-purple-500"
                                     />
+                                    <ScoreCard
+                                        title="Content Quality"
+                                        score={report.scores.content}
+                                        icon={BookOpen}
+                                        color="bg-yellow-500"
+                                    />
                                 </div>
 
                                 {/* Main Report */}
@@ -278,13 +284,29 @@ const ResumeReview = () => {
                                             <h2 className="text-2xl font-bold text-foreground">Analysis Report</h2>
                                             <p className="text-muted-foreground text-sm mt-1">{report.summary}</p>
                                         </div>
-                                        <button
-                                            onClick={handleDownloadPDF}
-                                            className="flex items-center text-sm font-medium text-primary hover:underline"
-                                        >
-                                            <Download className="w-4 h-4 mr-1" />
-                                            Download PDF
-                                        </button>
+
+                                        {user ? (
+                                            <button
+                                                onClick={handleDownloadPDF}
+                                                className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                                            >
+                                                <Download className="w-4 h-4" />
+                                                Download PDF
+                                            </button>
+                                        ) : (
+                                            <div className="group relative">
+                                                <button
+                                                    disabled
+                                                    className="flex items-center gap-2 rounded-lg bg-muted px-4 py-2 text-sm font-medium text-muted-foreground cursor-not-allowed opacity-70"
+                                                >
+                                                    <Download className="w-4 h-4" />
+                                                    Download PDF
+                                                </button>
+                                                <div className="absolute right-0 top-full mt-2 w-48 rounded-md bg-popover p-2 text-xs text-popover-foreground shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 border">
+                                                    Sign in to download the full PDF report!
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
 
                                     <hr className="border-border" />

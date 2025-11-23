@@ -48,7 +48,7 @@ const CreateRoadmap = () => {
 
             <div className="container mx-auto px-4 py-8 max-w-7xl">
                 <div className="mb-8">
-                    <UsageIndicator refreshTrigger={refreshKey} />
+                    <UsageIndicator refreshTrigger={refreshKey} type="roadmap" />
                 </div>
 
                 <div className="grid gap-8 lg:grid-cols-12 items-start">
