@@ -11,8 +11,10 @@ export const generatePDF = async (roadmapContent, userInputs) => {
 
         // Create a temporary container for the PDF content
         const container = document.createElement('div');
-        container.style.width = '800px'; // Fixed width for A4 consistency
-        container.style.padding = '40px';
+        container.style.width = '190mm'; // Page width minus left/right margins (10mm each)
+        container.style.maxWidth = '190mm';
+        container.style.boxSizing = 'border-box';
+        container.style.padding = '10mm';
         container.style.fontFamily = 'Helvetica, Arial, sans-serif';
         container.style.color = '#334155'; // Slate-700
         container.style.background = '#ffffff';
@@ -59,7 +61,16 @@ export const generatePDF = async (roadmapContent, userInputs) => {
         // Add custom styles for the markdown content
         const style = document.createElement('style');
         style.innerHTML = `
+                        .roadmap-content { word-break: break-word; overflow-wrap: anywhere; }
             .roadmap-content h1 { color: #1e3a8a; font-size: 24px; margin-top: 30px; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+            .roadmap-content h2 { color: #1e3a8a; font-size: 20px; margin-top: 25px; margin-bottom: 12px; }
+            .roadmap-content h3 { color: #0f172a; font-size: 18px; margin-top: 20px; margin-bottom: 10px; font-weight: bold; }
+            .roadmap-content h4 { color: #334155; font-size: 16px; margin-top: 15px; margin-bottom: 8px; font-weight: bold; }
+            .roadmap-content p { margin-bottom: 12px; text-align: justify; }
+            .roadmap-content ul, .roadmap-content ol { margin-bottom: 15px; padding-left: 20px; }
+            .roadmap-content li { margin-bottom: 5px; }
+            .roadmap-content strong { color: #0f172a; font-weight: bold; }
+            .roadmap-content table { width: 100%; table-layout: fixed; word-break: break-word; overflow-wrap: anywhere; }
             .roadmap-content h2 { color: #1e3a8a; font-size: 20px; margin-top: 25px; margin-bottom: 12px; }
             .roadmap-content h3 { color: #0f172a; font-size: 18px; margin-top: 20px; margin-bottom: 10px; font-weight: bold; }
             .roadmap-content h4 { color: #334155; font-size: 16px; margin-top: 15px; margin-bottom: 8px; font-weight: bold; }
