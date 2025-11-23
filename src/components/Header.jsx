@@ -36,14 +36,17 @@ const Header = () => {
                             </h1>
                         </Link>
 
-                        {/* <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+                        <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
                             <Link to="/" className="text-foreground/60 transition-colors hover:text-foreground/80">
                                 Home
                             </Link>
                             <Link to="/create" className="text-foreground/60 transition-colors hover:text-foreground/80">
                                 Create Roadmap
                             </Link>
-                        </nav> */}
+                            <Link to="/resume-review" className="text-foreground/60 transition-colors hover:text-foreground/80">
+                                Resume Review
+                            </Link>
+                        </nav>
                     </div>
 
                     <nav className="flex items-center gap-4">

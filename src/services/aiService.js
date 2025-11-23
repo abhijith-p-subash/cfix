@@ -92,3 +92,58 @@ export const saveRoadmap = async (userId, roadmapContent, userInputs) => {
         // Don't throw - saving is not critical
     }
 };
+
+/**
+ * Review resume using Gemini AI
+ */
+export const reviewResume = async (resumeText) => {
+    try {
+        const prompt = `You are an expert Career Coach and HR Specialist with decades of experience in recruitment and talent acquisition. Your task is to provide a comprehensive, critical, and constructive review of the following resume text.
+
+Resume Text:
+${resumeText}
+
+Please analyze the resume and provide a detailed report in standard markdown format. Do NOT use code blocks. Use bold text for emphasis.
+
+The report MUST include the following sections:
+
+1. **Executive Summary & Scores**
+   - **Overall Score**: (0-100)
+   - **Impact Score**: (High/Medium/Low) - How well the resume demonstrates results.
+   - **ATS Compatibility Score**: (0-100) - Estimate based on formatting and keyword usage.
+   - Brief summary of the candidate's profile (2-3 sentences).
+
+2. **Detailed Analysis**
+   - **Formatting & Structure**: Critique the layout, readability, and organization.
+   - **Content Quality**: Evaluate the clarity, strength of bullet points, and use of action verbs.
+   - **Grammar & Consistency**: Identify typos, grammatical errors, or inconsistencies.
+
+3. **ATS Optimization**
+   - **Keywords Found**: List strong industry-relevant keywords present.
+   - **Missing Keywords**: Suggest critical keywords that are missing based on the candidate's likely target role.
+   - **Formatting Issues**: Highlight any elements that might confuse ATS (e.g., tables, graphics).
+
+4. **Value Assessment**
+   - **Estimated Salary Range**: Provide a realistic salary range (e.g., $80k - $120k) based on the experience level and skills shown. Mention that this varies by location (e.g., "In major tech hubs like SF/NY...").
+   - **Market Demand**: Assess the current demand for this profile.
+
+5. **Actionable Improvements**
+   - Provide a numbered list of specific, high-impact changes to improve the resume immediately.
+   - Suggest specific rewrites for weak bullet points.
+
+6. **Best Practices & Tips**
+   - General advice for tailoring this resume for specific job applications.
+
+Format the output clearly with headers (#, ##) and bullet points. Be honest but encouraging.`;
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.0-flash',
+            contents: prompt
+        });
+
+        return response.candidates[0].content.parts[0].text;
+    } catch (error) {
+        console.error('Error reviewing resume:', error);
+        throw new Error('Failed to review resume. Please try again.');
+    }
+};
