@@ -1,5 +1,6 @@
 import Header from '../components/Header';
 import ResumeReview from '../components/ResumeReview';
+import Footer from '../components/Footer';
 
 const ResumeReviewPage = () => {
     return (
@@ -8,6 +9,7 @@ const ResumeReviewPage = () => {
             <main>
                 <ResumeReview />
             </main>
+            <Footer />
         </div>
     );
 };

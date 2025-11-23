@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Map, FileText, Target } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 const Home = () => {
     const { user } = useAuth();
@@ -118,7 +119,7 @@ const Home = () => {
 
             {/* CTA */}
             <section className="py-24 bg-primary text-primary-foreground w-full text-center">
-                <div className="container px-4 md:px-6">
+                <div className="px-4 md:px-6">
                     <h2 className="text-3xl font-bold mb-6">Ready to Accelerate Your Career?</h2>
                     <p className="text-primary-foreground/80 max-w-2xl mx-auto mb-10 text-lg">
                         Join thousands of professionals upgrading their careers with CareerFixAI.
@@ -134,6 +135,8 @@ const Home = () => {
                     )}
                 </div>
             </section>
+
+            <Footer />
         </div>
     );
 };

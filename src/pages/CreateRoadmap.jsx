@@ -5,6 +5,7 @@ import RoadmapGenerator from '../components/RoadmapGenerator';
 import RoadmapDisplay from '../components/RoadmapDisplay';
 import RoadmapHistory from '../components/RoadmapHistory';
 import AIGuide from '../components/AIGuide';
+import Footer from '../components/Footer';
 
 const CreateRoadmap = () => {
     const [generatedRoadmap, setGeneratedRoadmap] = useState(null);
@@ -89,6 +90,8 @@ const CreateRoadmap = () => {
                 {/* Floating AI Guide */}
                 <AIGuide focusedField={focusedField} />
             </div>
+
+            <Footer />
         </div>
     );
 };
