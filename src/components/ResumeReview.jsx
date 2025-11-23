@@ -179,7 +179,7 @@ const ResumeReview = () => {
 
                 <div className="grid gap-8 lg:grid-cols-12 items-start">
                     {/* Left Column: Upload & Controls (5 cols) */}
-                    <div className="lg:col-span-5 space-y-6">
+                    <div className="lg:col-span-12 space-y-6">
                         <div className="bg-card border rounded-xl p-6 shadow-sm">
                             <h2 className="text-xl font-semibold mb-2">Upload Resume</h2>
                             <p className="text-muted-foreground mb-6 text-sm">
@@ -246,7 +246,7 @@ const ResumeReview = () => {
                     </div>
 
                     {/* Right Column: Report Display (7 cols) */}
-                    <div className="lg:col-span-7">
+                    <div className="lg:col-span-12">
                         {report ? (
                             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 {/* Scores Section */}
