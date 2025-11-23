@@ -171,7 +171,7 @@ const ResumeReview = () => {
     );
 
     return (
-        <div className="min-h-screen bg-background pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-background pt-8 pb-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
                 <div className="mb-8">
                     <UsageIndicator refreshTrigger={refreshKey} type="resume" />
