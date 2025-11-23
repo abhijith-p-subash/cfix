@@ -73,7 +73,7 @@ const RoadmapGenerator = ({ onRoadmapGenerated, onFocusChange }) => {
             // Check usage limits
             const canGenerate = user
                 ? await canUserGenerate(user.uid)
-                : canGuestGenerate();
+                : await canGuestGenerate();
 
             if (!canGenerate) {
                 setError(
@@ -98,7 +98,7 @@ const RoadmapGenerator = ({ onRoadmapGenerated, onFocusChange }) => {
             if (user) {
                 await incrementUserUsage(user.uid);
             } else {
-                incrementGuestUsage();
+                await incrementGuestUsage();
             }
 
             // Save roadmap to Firestore

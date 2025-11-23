@@ -1,34 +1,102 @@
-import { doc, getDoc, updateDoc, increment } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, increment, serverTimestamp } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
-const GUEST_STORAGE_KEY = 'careerfix_guest_usage';
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
+
+
+const GUEST_COLLECTION = 'guest_usage';
 
 /**
- * Get usage data for guest users (from localStorage)
+ * Get unique device fingerprint
  */
-export const getGuestUsage = () => {
-    const stored = localStorage.getItem(GUEST_STORAGE_KEY);
-    if (!stored) {
-        return { count: 0, maxFree: 1 };
+const getDeviceFingerprint = async () => {
+    const fp = await FingerprintJS.load();
+    const result = await fp.get();
+    return result.visitorId;
+};
+
+/**
+ * Get public IP address
+ */
+const getPublicIP = async () => {
+    try {
+        const response = await fetch('https://api.ipify.org?format=json');
+        const data = await response.json();
+        return data.ip;
+    } catch (error) {
+        console.error('Error fetching IP:', error);
+        return 'unknown';
     }
-    return JSON.parse(stored);
+};
+
+/**
+ * Get usage data for guest users (from Firestore via Fingerprint)
+ */
+export const getGuestUsage = async () => {
+    try {
+        const visitorId = await getDeviceFingerprint();
+        const guestRef = doc(db, GUEST_COLLECTION, visitorId);
+        const guestDoc = await getDoc(guestRef);
+
+        if (guestDoc.exists()) {
+            const data = guestDoc.data();
+            return {
+                count: data.count || 0,
+                maxFree: data.maxFree || 1,
+                visitorId
+            };
+        }
+
+        return { count: 0, maxFree: 1, visitorId };
+    } catch (error) {
+        console.error('Error getting guest usage:', error);
+        // Fallback to restrictive default on error
+        return { count: 1, maxFree: 1 };
+    }
 };
 
 /**
  * Increment guest usage count
  */
-export const incrementGuestUsage = () => {
-    const usage = getGuestUsage();
-    usage.count += 1;
-    localStorage.setItem(GUEST_STORAGE_KEY, JSON.stringify(usage));
-    return usage;
+export const incrementGuestUsage = async () => {
+    try {
+        const visitorId = await getDeviceFingerprint();
+        const ip = await getPublicIP();
+        const guestRef = doc(db, GUEST_COLLECTION, visitorId);
+        const guestDoc = await getDoc(guestRef);
+
+        if (!guestDoc.exists()) {
+            await setDoc(guestRef, {
+                visitorId,
+                count: 1,
+                maxFree: 1,
+                ipAddress: ip,
+                userAgent: navigator.userAgent,
+                firstUsed: serverTimestamp(),
+                lastUsed: serverTimestamp()
+            });
+            return { count: 1, maxFree: 1 };
+        }
+
+        await updateDoc(guestRef, {
+            count: increment(1),
+            lastUsed: serverTimestamp(),
+            ipAddress: ip, // Update IP to track changes
+            userAgent: navigator.userAgent
+        });
+
+        return { count: (guestDoc.data().count || 0) + 1, maxFree: 1 };
+    } catch (error) {
+        console.error('Error incrementing guest usage:', error);
+        throw error;
+    }
 };
 
 /**
  * Check if guest has reached limit
  */
-export const canGuestGenerate = () => {
-    const usage = getGuestUsage();
+export const canGuestGenerate = async () => {
+    const usage = await getGuestUsage();
     return usage.count < usage.maxFree;
 };
 
@@ -104,7 +172,7 @@ export const canUserGenerate = async (userId) => {
  */
 export const getRemainingGenerations = async (user) => {
     if (!user) {
-        const usage = getGuestUsage();
+        const usage = await getGuestUsage();
         return usage.maxFree - usage.count;
     }
 
