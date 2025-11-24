@@ -13,7 +13,7 @@ import { generateResumePDF } from '../services/pdfService';
 import ReactMarkdown from 'react-markdown';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 import pdfWorker from 'pdfjs-dist/legacy/build/pdf.worker?url';
-import { Upload, FileText, Loader2, AlertCircle, CheckCircle, Download, ArrowLeft, BarChart2, TrendingUp, Award, BookOpen } from 'lucide-react';
+import { Upload, FileText, Loader2, AlertCircle, CheckCircle, Download, ArrowLeft, BarChart2, TrendingUp, Award, BookOpen, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import UsageIndicator from './UsageIndicator';
 import ResumeHistory from './ResumeHistory';
@@ -34,6 +34,14 @@ const ResumeReview = () => {
         checkUsage();
     }, [user, refreshKey]);
 
+    // Clear file and report when user logs out
+    useEffect(() => {
+        if (!user) {
+            setFile(null);
+            setReport(null);
+        }
+    }, [user]);
+
     const checkUsage = async () => {
         if (user) {
             const allowed = await canUserResumeGenerate(user.uid);
@@ -51,6 +59,16 @@ const ResumeReview = () => {
         } else {
             setFile(null);
             showError('Invalid File', 'Please upload a PDF or Text file.');
+        }
+    };
+
+    const handleClearFile = () => {
+        setFile(null);
+        setReport(null);
+        // Reset the file input
+        const fileInput = document.getElementById('resume-upload');
+        if (fileInput) {
+            fileInput.value = '';
         }
     };
 
@@ -203,9 +221,22 @@ const ResumeReview = () => {
                                         } ${(!canGenerate || loading) ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
                                     {file ? (
-                                        <div className="flex items-center justify-center text-primary">
-                                            <FileText className="w-6 h-6 mr-2" />
-                                            <span className="font-medium truncate max-w-[200px]">{file.name}</span>
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center text-primary">
+                                                <FileText className="w-6 h-6 mr-2" />
+                                                <span className="font-medium truncate max-w-[200px]">{file.name}</span>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    handleClearFile();
+                                                }}
+                                                className="ml-4 p-2 rounded-md hover:bg-destructive/10 text-destructive transition-colors"
+                                                title="Remove file"
+                                            >
+                                                <X className="w-5 h-5" />
+                                            </button>
                                         </div>
                                     ) : (
                                         <span className="text-muted-foreground flex flex-col items-center">

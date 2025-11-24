@@ -1,23 +1,8 @@
-import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 
 const LoadingScreen = () => {
-    const [fadeOut, setFadeOut] = useState(false);
-
-    useEffect(() => {
-        // Trigger fade out after a brief moment
-        const timer = setTimeout(() => {
-            setFadeOut(true);
-        }, 100);
-
-        return () => clearTimeout(timer);
-    }, []);
-
     return (
-        <div
-            className={`fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 transition-opacity duration-500 ${fadeOut ? 'opacity-0' : 'opacity-100'
-                }`}
-        >
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5">
             <div className="flex flex-col items-center space-y-6">
                 {/* Animated Logo/Spinner */}
                 <div className="relative">
