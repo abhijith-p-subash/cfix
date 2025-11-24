@@ -15,6 +15,29 @@ googleProvider.setCustomParameters({
 });
 
 /**
+ * Map Firebase error codes to user-friendly messages
+ */
+const getAuthErrorMessage = (error) => {
+    const errorCode = error.code;
+
+    const errorMessages = {
+        'auth/user-not-found': 'No account found with this email address',
+        'auth/wrong-password': 'Incorrect password. Please try again',
+        'auth/email-already-in-use': 'An account with this email already exists',
+        'auth/weak-password': 'Password should be at least 6 characters',
+        'auth/invalid-email': 'Please enter a valid email address',
+        'auth/user-disabled': 'This account has been disabled',
+        'auth/operation-not-allowed': 'This sign-in method is not enabled',
+        'auth/too-many-requests': 'Too many attempts. Please try again later',
+        'auth/network-request-failed': 'Network error. Please check your connection',
+        'auth/popup-closed-by-user': 'Sign-in cancelled',
+        'auth/cancelled-popup-request': 'Sign-in cancelled',
+    };
+
+    return errorMessages[errorCode] || error.message || 'An error occurred. Please try again';
+};
+
+/**
  * Create a new user with email and password
  */
 export const signUpWithEmail = async (email, password, displayName) => {
@@ -34,7 +57,7 @@ export const signUpWithEmail = async (email, password, displayName) => {
 
         return user;
     } catch (error) {
-        throw new Error(error.message);
+        throw new Error(getAuthErrorMessage(error));
     }
 };
 
@@ -46,7 +69,7 @@ export const signInWithEmail = async (email, password) => {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         return userCredential.user;
     } catch (error) {
-        throw new Error(error.message);
+        throw new Error(getAuthErrorMessage(error));
     }
 };
 
@@ -75,7 +98,7 @@ export const signInWithGoogle = async () => {
 
         return user;
     } catch (error) {
-        throw new Error(error.message);
+        throw new Error(getAuthErrorMessage(error));
     }
 };
 
@@ -86,7 +109,7 @@ export const logOut = async () => {
     try {
         await signOut(auth);
     } catch (error) {
-        throw new Error(error.message);
+        throw new Error(getAuthErrorMessage(error));
     }
 };
 

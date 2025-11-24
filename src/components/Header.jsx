@@ -1,12 +1,16 @@
+
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { logOut } from '../services/authService';
 import AuthModal from './AuthModal';
 import { User, LogOut, Menu, X } from 'lucide-react';
 
 const Header = () => {
     const { user } = useAuth();
+    const { showSuccess, showError } = useToast();
+    const location = useLocation();
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [authMode, setAuthMode] = useState('signin');
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -14,9 +18,11 @@ const Header = () => {
     const handleSignOut = async () => {
         try {
             await logOut();
+            showSuccess('Signed Out', 'You have been successfully signed out.');
             setMobileMenuOpen(false);
         } catch (error) {
             console.error('Error signing out:', error);
+            showError('Sign Out Error', error.message || 'Failed to sign out. Please try again.');
         }
     };
 

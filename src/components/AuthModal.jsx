@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { signInWithEmail, signUpWithEmail, signInWithGoogle } from '../services/authService';
+import { useToast } from '../context/ToastContext';
 import * as Dialog from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 
@@ -7,44 +8,39 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [displayName, setDisplayName] = useState('');
-    const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const { showSuccess, showError } = useToast();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
         setLoading(true);
 
         try {
             if (mode === 'signup') {
                 await signUpWithEmail(email, password, displayName);
+                showSuccess('Account Created', 'Welcome! Your account has been created successfully.');
             } else {
                 await signInWithEmail(email, password);
+                showSuccess('Welcome Back', 'You have successfully signed in.');
             }
             onClose();
         } catch (err) {
-            setError(err.message || 'An error occurred. Please try again.');
+            showError('Authentication Error', err.message);
         } finally {
             setLoading(false);
         }
     };
 
     const handleGoogleSignIn = async () => {
-        setError('');
         setLoading(true);
 
         try {
             await signInWithGoogle();
+            showSuccess('Welcome!', 'You have successfully signed in with Google.');
             onClose();
         } catch (err) {
             console.error("Google Sign In Error:", err);
-            if (err.message && (err.message.includes('network') || err.message.includes('protocol') || err.message.includes('QUIC'))) {
-                setError('Network error detected. Please check your connection, disable VPN, or try a different browser.');
-            } else if (err.message.includes('auth/operation-not-allowed')) {
-                setError('Google Sign-In is not enabled in the Firebase Console. Please enable it in Authentication > Sign-in method.');
-            } else {
-                setError(err.message || 'An error occurred. Please try again.');
-            }
+            showError('Google Sign-In Error', err.message);
         } finally {
             setLoading(false);
         }
@@ -119,12 +115,6 @@ const AuthModal = ({ mode, onClose, onSwitchMode }) => {
                                 minLength={6}
                             />
                         </div>
-
-                        {error && (
-                            <div className="text-sm font-medium text-destructive">
-                                {error}
-                            </div>
-                        )}
 
                         <button
                             type="submit"

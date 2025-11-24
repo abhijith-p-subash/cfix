@@ -64,6 +64,16 @@ Format the response in standard, clean markdown.
         return roadmap;
     } catch (error) {
         console.error('Error generating roadmap:', error);
+
+        // Provide user-friendly error messages
+        if (error.message?.includes('API key')) {
+            throw new Error('AI service is currently unavailable. Please try again later.');
+        } else if (error.message?.includes('quota') || error.message?.includes('rate limit')) {
+            throw new Error('Too many requests. Please wait a moment and try again.');
+        } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
+            throw new Error('Network error. Please check your connection and try again.');
+        }
+
         throw new Error('Failed to generate career roadmap. Please try again.');
     }
 };
@@ -155,6 +165,18 @@ Be specific. Avoid generic advice. If a bullet point is weak, explain WHY and su
         return JSON.parse(jsonString);
     } catch (error) {
         console.error('Error reviewing resume:', error);
+
+        // Provide user-friendly error messages
+        if (error.message?.includes('API key')) {
+            throw new Error('AI service is currently unavailable. Please try again later.');
+        } else if (error.message?.includes('quota') || error.message?.includes('rate limit')) {
+            throw new Error('Too many requests. Please wait a moment and try again.');
+        } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
+            throw new Error('Network error. Please check your connection and try again.');
+        } else if (error.message?.includes('JSON')) {
+            throw new Error('Error processing AI response. Please try again.');
+        }
+
         throw new Error('Failed to review resume. Please try again.');
     }
 };

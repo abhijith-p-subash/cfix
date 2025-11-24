@@ -1,17 +1,19 @@
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { generatePDF } from '../services/pdfService';
 import { Download, Lock, FileText, Loader2 } from 'lucide-react';
 
 const RoadmapDisplay = ({ roadmap, userInputs }) => {
     const { user } = useAuth();
+    const { showSuccess, showWarning, showError } = useToast();
     const [downloading, setDownloading] = useState(false);
     const [lastDownloadTime, setLastDownloadTime] = useState(0);
 
     const handleDownloadPDF = async () => {
         if (!user) {
-            alert('Please sign in to download your roadmap as PDF');
+            showWarning('Sign In Required', 'Please sign in to download your roadmap as PDF');
             return;
         }
 
@@ -24,7 +26,7 @@ const RoadmapDisplay = ({ roadmap, userInputs }) => {
         }
 
         if (timeSinceLastDownload < 2000) {
-            alert('⏳ Please wait a moment before downloading again.');
+            showWarning('Please Wait', 'Please wait a moment before downloading again.');
             return;
         }
 
@@ -33,8 +35,9 @@ const RoadmapDisplay = ({ roadmap, userInputs }) => {
 
         try {
             await generatePDF(roadmap, userInputs);
+            showSuccess('PDF Downloaded', 'Your roadmap has been downloaded successfully!');
         } catch (error) {
-            alert('Failed to generate PDF. Please try again.');
+            showError('Download Failed', 'Failed to generate PDF. Please try again.');
         } finally {
             // Keep downloading state for at least 1 second to prevent rapid re-clicks
             setTimeout(() => {

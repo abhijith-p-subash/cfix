@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import {
     canGuestGenerate,
     incrementGuestUsage,
@@ -11,6 +12,7 @@ import { Sparkles, Loader2 } from 'lucide-react';
 
 const RoadmapGenerator = ({ onRoadmapGenerated, onFocusChange }) => {
     const { user } = useAuth();
+    const { showSuccess, showError } = useToast();
     const [formData, setFormData] = useState({
         name: '',
         currentRole: '',
@@ -110,8 +112,10 @@ const RoadmapGenerator = ({ onRoadmapGenerated, onFocusChange }) => {
             // Pass roadmap to parent component
             onRoadmapGenerated(roadmap, submissionData);
 
+            showSuccess('Roadmap Generated!', 'Your personalized career roadmap is ready!');
+
         } catch (err) {
-            setError(err.message || 'Failed to generate roadmap. Please try again.');
+            showError('Generation Failed', err.message || 'Failed to generate roadmap. Please try again.');
         } finally {
             setLoading(false);
         }

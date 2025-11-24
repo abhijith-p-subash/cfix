@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import {
     canGuestResumeGenerate,
     incrementGuestResumeUsage,
@@ -22,9 +23,9 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
 const ResumeReview = () => {
     const { user } = useAuth();
+    const { showSuccess, showError, showWarning } = useToast();
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
     const [report, setReport] = useState(null); // Now expects JSON object
     const [refreshKey, setRefreshKey] = useState(0);
     const [canGenerate, setCanGenerate] = useState(true);
@@ -47,10 +48,9 @@ const ResumeReview = () => {
         const selectedFile = e.target.files[0];
         if (selectedFile && (selectedFile.type === 'application/pdf' || selectedFile.type === 'text/plain')) {
             setFile(selectedFile);
-            setError('');
         } else {
             setFile(null);
-            setError('Please upload a PDF or Text file.');
+            showError('Invalid File', 'Please upload a PDF or Text file.');
         }
     };
 
@@ -72,12 +72,11 @@ const ResumeReview = () => {
     const handleUpload = async () => {
         if (!file) return;
         if (!canGenerate) {
-            setError('You have reached your free limit for resume reviews.');
+            showWarning('Limit Reached', 'You have reached your free limit for resume reviews.');
             return;
         }
 
         setLoading(true);
-        setError('');
         setReport(null);
 
         try {
@@ -107,9 +106,11 @@ const ResumeReview = () => {
 
             setRefreshKey(prev => prev + 1);
 
+            showSuccess('Resume Analyzed!', 'Your resume analysis is complete.');
+
         } catch (err) {
             console.error(err);
-            setError(err.message || 'Failed to analyze resume.');
+            showError('Analysis Failed', err.message || 'Failed to analyze resume.');
         } finally {
             setLoading(false);
         }
@@ -118,7 +119,7 @@ const ResumeReview = () => {
     const handleDownloadPDF = async () => {
         if (!report) return;
         if (!user) {
-            setError('Please sign in to download the PDF report.');
+            showWarning('Sign In Required', 'Please sign in to download the PDF report.');
             return;
         }
 
@@ -127,6 +128,7 @@ const ResumeReview = () => {
         };
 
         await generateResumePDF(report, dummyInputs);
+        showSuccess('PDF Downloaded', 'Your resume report has been downloaded!');
     };
 
     const handleSelectHistory = (resume) => {
@@ -214,14 +216,7 @@ const ResumeReview = () => {
                                 </label>
                             </div>
 
-                            {error && (
-                                <div className="mt-4 p-3 bg-destructive/10 text-destructive rounded-lg flex items-center justify-center text-sm">
-                                    <AlertCircle className="w-4 h-4 mr-2" />
-                                    {error}
-                                </div>
-                            )}
-
-                            {!canGenerate && !error && (
+                            {!canGenerate && (
                                 <div className="mt-4 p-3 bg-yellow-500/10 text-yellow-600 rounded-lg flex items-center justify-center text-sm">
                                     <AlertCircle className="w-4 h-4 mr-2" />
                                     Limit reached. {user ? 'Upgrade for more.' : 'Sign in for more.'}
